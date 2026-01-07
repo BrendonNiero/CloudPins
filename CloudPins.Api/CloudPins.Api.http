@@ -1,0 +1,6 @@
+@CloudPins.Api_HostAddress = http://localhost:5023
+
+GET {{CloudPins.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
