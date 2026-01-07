@@ -15,20 +15,20 @@ O sistema permite que um usuário:
 ## 🚩 Bounded Context
 
 ### Entidades Principais
-👦 User
+👦 Users
 - Id
 - Name
 - Email
 - ProfileUrl
 
- 📁 Board
+ 📁 Boards
 - Id
 - OwnerdId
 - Name
 - Description
 - IsPublic
 
-📌 Pin
+📌 Pins
 - Id
 - OwnerdId
 - BoardId
@@ -39,3 +39,17 @@ O sistema permite que um usuário:
 - Tags
 - CreatedAt
 - LikesCount
+
+❤ Likes
+- UserId
+- PinId
+
+### ⚙ Relacionamentos 
+- Users -> Boards   (1:N)
+- Boards -> Pins    (1:N)
+- Pins -> Likes     (1:N)
+
+# 📲 Feed
+- Pins públicos
+- Ordenados por CreatedAt
+
