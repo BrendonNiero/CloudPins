@@ -15,7 +15,7 @@ public class User : BaseEntity
         Id = Guid.NewGuid();
         Name = name;
         Email = email;
-        ProfileUrl = ProfileUrl;
+        ProfileUrl = profileUrl;
         CreatedAt = DateTime.UtcNow;
     }
 
