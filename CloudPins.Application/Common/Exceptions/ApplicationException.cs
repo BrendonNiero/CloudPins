@@ -1,4 +1,4 @@
-namespace CloudPins.Application.Common.Excceptions;
+namespace CloudPins.Application.Common.Exceptions;
 
 public abstract class ApplicationException : Exception
 {
