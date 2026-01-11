@@ -1,6 +1,4 @@
 using CloudPins.Domain.Common;
-using CloudPins.Domain.Tags;
-
 namespace CloudPins.Domain.Pins;
 
 public class Pin : BaseEntity
@@ -11,31 +9,51 @@ public class Pin : BaseEntity
     public string ThumbnailUrl { get; private set; } = string.Empty;
     public string Title { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
-    private readonly List<Tag> _tags = new();
-    public IReadOnlyCollection<Tag> Tags => _tags;
+    private readonly List<Guid> _tagIds = new();
+    public IReadOnlyCollection<Guid> TagIds => _tagIds.AsReadOnly();
     public int LikesCount { get; private set; }
     protected Pin (){}
 
-    public Pin(Guid ownerId, Guid boardId, string imageUrl, 
-        string thumbnailUrl, string title, string description)
+    public static Pin Create(
+        Guid ownerId,
+        Guid boardId,
+        string imageUrl,
+        string thumbNailUrl,
+        string title,
+        string description,
+        IEnumerable<Guid> tagIds
+    )
     {
-        Id = Guid.NewGuid();
-        OwnerId = ownerId;
-        BoardId = boardId;
-        ImageUrl = imageUrl;
-        ThumbnailUrl = thumbnailUrl;
-        Title = title;
-        Description = description;
-        LikesCount = 0;
-        CreatedAt = DateTime.UtcNow;
+        var pin = new Pin
+        {
+            Id = Guid.NewGuid(),
+            OwnerId = ownerId,
+            BoardId = boardId,
+            ImageUrl = imageUrl,
+            ThumbnailUrl = thumbNailUrl,
+            Title = title,
+            Description = description,
+            LikesCount = 0,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        foreach(var tagId in tagIds.Distinct())
+        {
+            pin.AddTag(tagId);
+        }
+        return pin;
     }
 
     public void AddLike() => LikesCount++;
-    public void RemoveLike() => LikesCount--;
-
-    public void AddTag(Tag tag)
+    public void RemoveLike()
     {
-        if(_tags.Any(t => t.Id == tag.Id)) return;
-        _tags.Add(tag);
+        if(LikesCount > 0)
+            LikesCount--;
+    }
+
+    public void AddTag(Guid tagId)
+    {
+        if(_tagIds.Contains(tagId)) return;
+        _tagIds.Add(tagId);
     }
 }
