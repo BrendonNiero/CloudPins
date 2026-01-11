@@ -11,14 +11,22 @@ public class Board : BaseEntity
 
     protected Board(){}
 
-    public Board(Guid ownerId, string name, string description, bool isPublic)
+    public static Board Create (Guid ownerId, 
+        string name, 
+        string description, 
+        bool isPublic)
     {
-        Id = Guid.NewGuid();
-        OwnerId = ownerId;
-        Name = name;
-        Description = description;
-        IsPublic = isPublic;
-        CreatedAt = DateTime.UtcNow;
+        var board = new Board
+        {            
+            Id = Guid.NewGuid(),
+            OwnerId = ownerId,
+            Name = name,
+            Description = description,
+            IsPublic = isPublic,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        return board;
     }
 
     public void Rename(string name, string description)
