@@ -1,5 +1,7 @@
 using CloudPins.Application.Common.Interfaces;
+using CloudPins.Application.Pins.GetByBoard;
 using CloudPins.Application.Pins.GetById;
+using CloudPins.Application.Pins.GetFeed;
 using Microsoft.EntityFrameworkCore;
 
 namespace CloudPins.Infrastructure.Persistence.Repositories;
@@ -31,5 +33,15 @@ public class PinReadRepository : IPinReadRepository
             CreatedAt = p.CreatedAt
         })
         .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<List<PinFeedItemDto>> GetFeedAsync(Guid id, int page, int pageSize, CancellationToken ct)
+    {
+        return new List<PinFeedItemDto>();
+    }
+
+    public async Task<List<PinBoardItemDto>> GetByBoardAsync(Guid boardId, CancellationToken ct)
+    {
+        return new List<PinBoardItemDto>();
     }
 }
