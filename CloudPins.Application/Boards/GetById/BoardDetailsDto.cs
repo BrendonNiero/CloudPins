@@ -7,6 +7,7 @@ public class BoardDetailsDto
     public string Name { get; init; } = string.Empty;
     public string? Description { get; init; }
     public bool IsPublic { get; init; }
+    public DateTime CreatedAt { get; init; }
 
     public IReadOnlyCollection<Guid> PinIds { get; init; } = [];
 }

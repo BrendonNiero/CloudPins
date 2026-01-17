@@ -35,13 +35,42 @@ public class PinReadRepository : IPinReadRepository
         .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<List<PinFeedItemDto>> GetFeedAsync(Guid id, int page, int pageSize, CancellationToken ct)
+    public async Task<List<PinFeedItemDto>> GetFeedAsync(
+        Guid id, 
+        int page, 
+        int pageSize, 
+        CancellationToken ct)
     {
-        return new List<PinFeedItemDto>();
+        return await _context.Pins
+        .AsNoTracking()
+        .OrderByDescending(p => p.CreatedAt)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(p => new PinFeedItemDto
+        {
+            Id = p.Id,
+            ThumbnailUrl = p.ThumbnailUrl
+        })
+        .ToListAsync(ct);
     }
 
-    public async Task<List<PinBoardItemDto>> GetByBoardAsync(Guid boardId, CancellationToken ct)
+    public async Task<List<PinBoardItemDto>> GetByBoardAsync(
+        Guid boardId,
+        int page,
+        int pageSize,
+        CancellationToken ct)
     {
-        return new List<PinBoardItemDto>();
+        return await _context.Pins
+        .AsNoTracking()
+        .Where(p => p.BoardId == boardId)
+        .OrderByDescending(p => p.CreatedAt)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(p => new PinBoardItemDto
+        {
+            Id = p.Id,
+            ThumbnailUrl = p.ThumbnailUrl
+        })
+        .ToListAsync(ct);
     }
 }

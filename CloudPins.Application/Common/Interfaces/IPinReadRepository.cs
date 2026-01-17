@@ -15,5 +15,10 @@ public interface IPinReadRepository
         CancellationToken ct
     );
 
-    Task<List<PinBoardItemDto>> GetByBoardAsync(Guid boardId, CancellationToken ct);
+    Task<List<PinBoardItemDto>> GetByBoardAsync(
+        Guid boardId,
+        int page,
+        int pageSize,
+        CancellationToken ct
+    );
 }
