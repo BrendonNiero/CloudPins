@@ -6,5 +6,4 @@ public interface IPinRepository
 {
     Task<Pin?> GetByIdAsync(Guid id, CancellationToken ct);
     Task AddAsync(Pin pin, CancellationToken ct);
-    Task UpdateAsync(Pin pin, CancellationToken ct);
 }

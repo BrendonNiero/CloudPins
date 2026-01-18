@@ -9,23 +9,27 @@ public class CreatePinCommandHandler
     private readonly IPinRepository _pinRepository;
     private readonly IBoardRepository _boardRepository;
 
+    private readonly IUnitOfWork _unitOfWork;
+
     public CreatePinCommandHandler(
         IPinRepository pinRepository,
-        IBoardRepository boardRepository
+        IBoardRepository boardRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _pinRepository = pinRepository;
         _boardRepository = boardRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CreatePinResult> Handle(
         CreatePinCommand command,
         Guid currentUserId,
-        CancellationToken cancellationToken
+        CancellationToken ct
     )
     {
         var boardExists = await _boardRepository
-        .ExistsAsync(command.BoardId, cancellationToken);
+        .ExistsAsync(command.BoardId, ct);
 
         if(!boardExists)
             throw new NotFoundException("Board not found.");
@@ -40,7 +44,8 @@ public class CreatePinCommandHandler
             tagIds: command.TagIds
         );
 
-        await _pinRepository.AddAsync(pin, cancellationToken);
+        await _pinRepository.AddAsync(pin, ct);
+        await _unitOfWork.SaveChangesAsync(ct);
 
         return new CreatePinResult
         {

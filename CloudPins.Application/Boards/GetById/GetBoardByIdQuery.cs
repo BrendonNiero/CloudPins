@@ -1,6 +1,3 @@
 namespace CloudPins.Application.Boards.GetById;
 
-public class GetBoardByIdQuery
-{
-    public Guid BoardId { get; init; }
-}
+public record GetBoardByIdQuery(Guid BoardId);

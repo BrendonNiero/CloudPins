@@ -7,10 +7,12 @@ namespace CloudPins.Application.Boards.Create;
 public class CreateBoardCommandHandler
 {
     private IBoardRepository _boardRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateBoardCommandHandler(IBoardRepository boardRepository)
+    public CreateBoardCommandHandler(IBoardRepository boardRepository, IUnitOfWork unitOfWork)
     {
         _boardRepository = boardRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CreateBoardResult> Handle(
@@ -27,6 +29,7 @@ public class CreateBoardCommandHandler
 
        await _boardRepository.AddAsync(board, ct);
 
+       await _unitOfWork.SaveChangesAsync(ct);
        return new CreateBoardResult
        {
          Id = board.Id,

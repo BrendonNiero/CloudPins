@@ -6,10 +6,12 @@ namespace CloudPins.Application.Tags.Create;
 public class CreateTagCommandHandler
 {
     private readonly ITagRepository _tagRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateTagCommandHandler(ITagRepository tagRepository)
+    public CreateTagCommandHandler(ITagRepository tagRepository, IUnitOfWork unitOfWork)
     {
         _tagRepository = tagRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CreateTagResult> Handle(
@@ -20,6 +22,7 @@ public class CreateTagCommandHandler
         var tag = new Tag(command.Name);
 
         await _tagRepository.AddAsync(tag, ct);
+        await _unitOfWork.SaveChangesAsync(ct);
 
         return new CreateTagResult
         {

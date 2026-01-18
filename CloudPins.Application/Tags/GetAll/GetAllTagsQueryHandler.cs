@@ -12,7 +12,6 @@ public class GetAllTagsQueryHanddler
     }
 
     public async Task<List<TagDto>> Handle(
-        GetAllTagsQuery query,
         CancellationToken ct
     )
     {

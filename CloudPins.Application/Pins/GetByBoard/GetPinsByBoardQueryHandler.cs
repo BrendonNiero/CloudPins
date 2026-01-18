@@ -13,9 +13,11 @@ public class GetPinsByBoardQueryHandler
 
     public Task<List<PinBoardItemDto>> Handle(
         GetPinsByBoardQuery query,
+        int page,
+        int pageSize,
         CancellationToken ct
     )
     {
-        return _pinReadRepository.GetByBoardAsync(query.BoardId, ct);
+        return _pinReadRepository.GetByBoardAsync(query.BoardId, page, pageSize, ct);
     }
 }
