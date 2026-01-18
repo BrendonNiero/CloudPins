@@ -25,4 +25,11 @@ public class TagReadRepository : ITagReadRepository
         ))
         .ToListAsync();
     }
+
+    public async Task<bool> ExistsAsync(string name, CancellationToken ct)
+    {
+        return await _context.Tags
+        .AsNoTracking()
+        .AnyAsync(t => t.Name == name && !t.IsDeleted, ct);
+    }
 }
