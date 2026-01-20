@@ -22,7 +22,6 @@ public class BoardReadRepository : IBoardReadRepository
             Id = b.Id,
             OwnerId = b.OwnerId,
             Name = b.Name,
-            Description = b.Description,
             IsPublic = b.IsPublic,
             CreatedAt = b.CreatedAt,
             PinIds = _context.Pins
@@ -47,7 +46,6 @@ public class BoardReadRepository : IBoardReadRepository
             Id = b.Id,
             OwnerId = b.OwnerId,
             Name = b.Name,
-            Description = b.Description,
             IsPublic = b.IsPublic,
             CreatedAt = b.CreatedAt,
 

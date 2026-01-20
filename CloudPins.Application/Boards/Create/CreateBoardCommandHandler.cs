@@ -1,4 +1,3 @@
-using CloudPins.Application.Common.Exceptions;
 using CloudPins.Application.Common.Interfaces;
 using CloudPins.Domain.Boards;
 
@@ -23,7 +22,6 @@ public class CreateBoardCommandHandler
        var board = Board.Create(
         ownerId: currentUserId,
         name: command.Name,
-        description: command.Description ?? "",
         isPublic: command.IsPublic
        );
 
