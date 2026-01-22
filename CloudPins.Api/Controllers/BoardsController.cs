@@ -1,4 +1,5 @@
 using CloudPins.Application.Boards.Create;
+using CloudPins.Application.Boards.GetAll;
 using CloudPins.Application.Boards.GetById;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +11,17 @@ public class BoardsController : ControllerBase
 {
     private readonly CreateBoardCommandHandler _createHandler;
     private readonly GetBoardByIdQueryHandler _getByIdHandler;
+    private readonly GetAllBoardsQueryHandler _getAllHandler;
 
     public BoardsController(
         CreateBoardCommandHandler createHandler,
-        GetBoardByIdQueryHandler getByIdHandler
+        GetBoardByIdQueryHandler getByIdHandler,
+        GetAllBoardsQueryHandler getAllHandler
     )
     {
         _createHandler = createHandler;
         _getByIdHandler = getByIdHandler;
+        _getAllHandler = getAllHandler;
     }
 
     [HttpPost]
@@ -41,8 +45,14 @@ public class BoardsController : ControllerBase
     {
         var board = await _getByIdHandler.Handle(new GetBoardByIdQuery(id), ct);
 
-        if(board is null) return NotFound();
-
         return Ok(board);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken ct)
+    {
+        var currentUserId = Guid.NewGuid();
+        var boards = await _getAllHandler.Handle(new GetAllBoardsQuery(currentUserId), ct);
+        return Ok(boards);
     }
 }

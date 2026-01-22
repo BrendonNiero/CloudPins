@@ -9,5 +9,12 @@ public class GetAllBoardsQueryHandler
         _boardReadRepository = boardReadRepository;
     }
 
-    public async Task Handle(){}
+    public async Task<IReadOnlyCollection<BoardListItemDto>> Handle(
+        GetAllBoardsQuery query, 
+        CancellationToken ct
+    )
+    {
+        
+        return await _boardReadRepository.GetAllAsync(query.UserId, ct);
+    }
 }

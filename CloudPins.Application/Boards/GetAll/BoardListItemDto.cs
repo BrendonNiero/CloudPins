@@ -1,9 +1,10 @@
 namespace CloudPins.Application.Boards.GetAll;
 
-public class BoardListItemDto
-{
-    public Guid Id { get; init; }
-    public string Name { get; init; } = string.Empty;
-    public bool IsPublic { get; init; }
-    public IReadOnlyCollection<BoardListDto> LastPins { get; init; } = [];
-}
+public record BoardListItemDto(
+    Guid Id, 
+    string Name, 
+    bool IsPublic, 
+    IReadOnlyCollection<BoardLastPinDto> LastPins,
+    int PinsCount,
+    DateTime CreatedAt
+);

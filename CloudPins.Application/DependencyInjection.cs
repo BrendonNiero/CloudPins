@@ -1,4 +1,5 @@
 using CloudPins.Application.Boards.Create;
+using CloudPins.Application.Boards.GetAll;
 using CloudPins.Application.Boards.GetById;
 using CloudPins.Application.Pins.Create;
 using CloudPins.Application.Pins.GetById;
@@ -17,6 +18,7 @@ public static class DependencyInjection
         // BOARDS
         services.AddScoped<CreateBoardCommandHandler>();
         services.AddScoped<GetBoardByIdQueryHandler>();
+        services.AddScoped<GetAllBoardsQueryHandler>();
 
         // PINS
         services.AddScoped<CreatePinCommandHandler>();
