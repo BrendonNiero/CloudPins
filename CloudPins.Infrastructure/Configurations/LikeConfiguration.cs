@@ -2,6 +2,7 @@ using CloudPins.Domain.Likes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace CloudPins.Infrastructure.Configurations;
 public class LikeConfiguration : IEntityTypeConfiguration<Like>
 {
     public void Configure(EntityTypeBuilder<Like> builder)

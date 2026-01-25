@@ -1,0 +1,1 @@
+namespace CloudPins.Infrastructure.Configurations;

@@ -24,6 +24,7 @@ public class BoardReadRepository : IBoardReadRepository
             b.IsPublic,
             _context.Pins
             .Where(p => p.BoardId == boardId && !p.IsDeleted)
+            .OrderByDescending(p => p.CreatedAt)
             .Select(p => new BoardPinItemDto
             (
                 p.Id,
