@@ -1,6 +1,7 @@
 using CloudPins.Application.Common.Interfaces;
 using CloudPins.Infrastructure.Persistence;
 using CloudPins.Infrastructure.Persistence.Repositories;
+using CloudPins.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,8 @@ public static class DependencyInjection
         services.AddScoped<IPinRepository, PinRepository>();
         services.AddScoped<IBoardRepository, BoardRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
         services.AddScoped<IPinReadRepository, PinReadRepository>();
         services.AddScoped<IBoardReadRepository, BoardReadRepository>();
