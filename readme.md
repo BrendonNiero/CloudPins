@@ -12,6 +12,16 @@ O sistema permite que um usuário:
 - Veja um feed público de pins
 - Dê like em pins
 
+## 🍇 Comandos Migrations
+### ➕ Criar um nova migration
+```
+dotnet ef migrations add NomeDaMigrationNova --project CloudPins.Infrastructure --startup-project CloudPins.Api
+```
+### 🔄 Atualizar Banco
+```
+dotnet ef database update --project CloudPins.Infrastructure --startup-project CloudPins.Api
+```
+
 ## 🚩 Bounded Context
 
 ### Entidades Principais

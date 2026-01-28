@@ -6,6 +6,8 @@ using CloudPins.Application.Pins.GetById;
 using CloudPins.Application.Pins.GetFeed;
 using CloudPins.Application.Tags.Create;
 using CloudPins.Application.Tags.GetAll;
+using CloudPins.Application.Users.Create;
+using CloudPins.Application.Users.Login;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudPins.Application;
@@ -28,6 +30,10 @@ public static class DependencyInjection
         // TAGS
         services.AddScoped<CreateTagCommandHandler>();
         services.AddScoped<GetAllTagsQueryHanddler>();
+
+        // USERS 
+        services.AddScoped<CreateUserCommandHandler>();
+        services.AddScoped<LoginCommandHandler>();
 
         return services;
     }
