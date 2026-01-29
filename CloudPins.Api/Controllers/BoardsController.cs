@@ -1,3 +1,4 @@
+using CloudPins.Api.Common;
 using CloudPins.Application.Boards.Create;
 using CloudPins.Application.Boards.GetAll;
 using CloudPins.Application.Boards.GetById;
@@ -30,7 +31,7 @@ public class BoardsController : ControllerBase
         CancellationToken ct
     )
     {
-        var currentUserId = Guid.NewGuid();
+        var currentUserId = HttpContext.GetUserId();
         var result = await _createHandler.Handle(command, currentUserId, ct);
 
         return CreatedAtAction(
@@ -51,7 +52,7 @@ public class BoardsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
-        var currentUserId = Guid.NewGuid();
+        var currentUserId = HttpContext.GetUserId();
         var boards = await _getAllHandler.Handle(new GetAllBoardsQuery(currentUserId), ct);
         return Ok(boards);
     }

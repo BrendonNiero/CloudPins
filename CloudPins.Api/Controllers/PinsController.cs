@@ -1,3 +1,4 @@
+using CloudPins.Api.Common;
 using CloudPins.Application.Pins.Create;
 using CloudPins.Application.Pins.GetAll;
 using CloudPins.Application.Pins.GetById;
@@ -54,7 +55,7 @@ public class PinsController : ControllerBase
     [HttpGet("feed")]
     public async Task<IActionResult> GetFeed(CancellationToken ct)
     {
-        var currentUserId = Guid.NewGuid();
+        var currentUserId = HttpContext.GetUserId();
         var feed = await _feedHandler.Handle(
             new GetPinsFeedQuery(),
             currentUserId,
