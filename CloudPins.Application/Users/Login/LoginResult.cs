@@ -4,5 +4,6 @@ public record LoginResult(
     Guid UserId,
     string Name, 
     string Email,
-    string ProfileUrl
+    string ProfileUrl,
+    string token
 );

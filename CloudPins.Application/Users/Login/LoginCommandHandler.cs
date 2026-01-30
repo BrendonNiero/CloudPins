@@ -6,14 +6,17 @@ namespace CloudPins.Application.Users.Login;
 public class LoginCommandHandler
 {
     private readonly IUserRepository _userRepository;
+    private readonly IJwtTokenGenerator _jwt;
     private readonly IPasswordHasher _passwordHasher;
 
     public LoginCommandHandler(
         IUserRepository userRepository,
+        IJwtTokenGenerator jwt,
         IPasswordHasher passwordHasher
     )
     {
         _userRepository = userRepository;
+        _jwt = jwt;
         _passwordHasher = passwordHasher;
     }
 
@@ -31,13 +34,15 @@ public class LoginCommandHandler
 
         if(!validPassword)
             throw new UnauthorizedException("Invalid credentials.");
-
+        
+        var token = _jwt.Generate(user.Id, user.Email);
 
         return new LoginResult(
             user.Id,
             user.Name,
             user.Email,
-            user.ProfileUrl
+            user.ProfileUrl,
+            token
         );
     }
 }

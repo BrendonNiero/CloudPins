@@ -5,6 +5,7 @@ using CloudPins.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace CloudPins.Infrastructure;
 
@@ -19,6 +20,12 @@ public static class DependencyInjection
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection")
             ));
+
+        services.Configure<JwtSettings>(
+            configuration.GetSection("Jwt")
+        );
+
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddScoped<IPinRepository, PinRepository>();
         services.AddScoped<IBoardRepository, BoardRepository>();
