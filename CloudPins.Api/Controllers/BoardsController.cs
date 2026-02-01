@@ -2,6 +2,7 @@ using CloudPins.Api.Common;
 using CloudPins.Application.Boards.Create;
 using CloudPins.Application.Boards.GetAll;
 using CloudPins.Application.Boards.GetById;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudPins.Api.Controllers;
@@ -49,6 +50,7 @@ public class BoardsController : ControllerBase
         return Ok(board);
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {

@@ -1,4 +1,5 @@
 using System.Text;
+using CloudPins.Api.Common;
 using CloudPins.Application;
 using CloudPins.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -31,8 +32,10 @@ builder.Services.AddControllers();
 // Swagger | OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerWithJwt();
 
 builder.Services.AddApplication();
+
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
