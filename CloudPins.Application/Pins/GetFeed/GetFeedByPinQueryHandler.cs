@@ -1,23 +1,23 @@
 using CloudPins.Application.Common.Interfaces;
-using CloudPins.Application.Pins.GetAll;
 
 namespace CloudPins.Application.Pins.GetFeed;
 
-public class GetPinsFeedQueryHandler
+public class GetFeedByPinQueryHandler
 {
     private readonly IPinReadRepository _pinReadRepository;
 
-    public GetPinsFeedQueryHandler(IPinReadRepository pinReadRepository)
+    public GetFeedByPinQueryHandler(IPinReadRepository pinReadRepository)
     {
         _pinReadRepository = pinReadRepository;
     }
 
     public Task<List<PinFeedItemDto>> Handle(
-        GetPinsFeedQuery query,
+        FeedByPinQuery query,
         CancellationToken ct
     )
     {
-        return _pinReadRepository.GetFeedAsync(
+        return _pinReadRepository.GetFeedByPinAsync(
+            query.PinId,
             query.Page,
             query.PageSize,
             ct

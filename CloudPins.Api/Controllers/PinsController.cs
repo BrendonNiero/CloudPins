@@ -3,7 +3,8 @@ using CloudPins.Application.Pins.Create;
 using CloudPins.Application.Pins.GetAll;
 using CloudPins.Application.Pins.GetById;
 using CloudPins.Application.Pins.GetFeed;
-using Microsoft.AspNetCore.Authorization;
+using CloudPins.Application.Pins.LikePin;
+using CloudPins.Application.Pins.UnlikePin;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudPins.Api.Controllers;
@@ -16,18 +17,24 @@ public class PinsController : ControllerBase
     private readonly GetPinByIdQueryHandler _getByIdHandler;
     private readonly GetPinsFeedQueryHandler _feedHandler;
     private readonly GetFeedByPinQueryHandler _feedByPinHandler;
+    private readonly LikePinCommandHandler _likePinHandler;
+    private readonly UnlikePinCommandHandler _unlikePinHandler;
 
     public PinsController(
         CreatePinCommandHandler createHandler,
         GetPinByIdQueryHandler getByIdHandler,
         GetPinsFeedQueryHandler feedHandler,
-        GetFeedByPinQueryHandler feedByPinHandler
+        GetFeedByPinQueryHandler feedByPinHandler,
+        LikePinCommandHandler likePinHandler,
+        UnlikePinCommandHandler unlikePinHandler
     )
     {
         _createHandler = createHandler;
         _getByIdHandler = getByIdHandler;
         _feedHandler = feedHandler;
         _feedByPinHandler = feedByPinHandler;
+        _likePinHandler = likePinHandler;
+        _unlikePinHandler = unlikePinHandler;
     }
 
     [HttpPost]
@@ -36,7 +43,7 @@ public class PinsController : ControllerBase
         CancellationToken ct
     )
     {
-        var currentUserId = Guid.NewGuid();
+        var currentUserId = HttpContext.GetUserId();
 
         var result = await _createHandler.Handle(command, currentUserId, ct);
 
@@ -74,5 +81,25 @@ public class PinsController : ControllerBase
             ct
         );
         return Ok(feedByPin);
+    }
+
+    [HttpPost("{id:guid}/like")]
+    public async Task<IActionResult> LikePin(Guid id, CancellationToken ct)
+    {
+        var currentUserId = HttpContext.GetUserId();
+
+        await _likePinHandler.Handle(id, currentUserId, ct);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}/like")]
+    public async Task<IActionResult> UnlikePin(Guid id, CancellationToken ct)
+    {
+        var currentUserId = HttpContext.GetUserId();
+
+        await _unlikePinHandler.Handle(id, currentUserId, ct);
+
+        return NoContent();
     }
 }

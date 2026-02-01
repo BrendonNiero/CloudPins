@@ -41,7 +41,7 @@ public class CreatePinCommandHandler
             thumbNailUrl: command.ThumbNailUrl,
             title: command.Title,
             description: command.Description,
-            tagIds: command.TagIds
+            tagIds: command.TagIds ?? Enumerable.Empty<Guid>()
         );
 
         await _pinRepository.AddAsync(pin, ct);

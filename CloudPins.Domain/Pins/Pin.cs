@@ -9,8 +9,8 @@ public class Pin : BaseEntity
     public string ThumbnailUrl { get; private set; } = string.Empty;
     public string Title { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
-    private readonly List<Guid> _tagIds = new();
-    public IReadOnlyCollection<Guid> TagIds => _tagIds.AsReadOnly();
+    private readonly List<PinTag> _pinTags = new();
+    public IReadOnlyCollection<PinTag> PinTags => _pinTags.AsReadOnly();
     public int LikesCount { get; private set; }
     protected Pin (){}
 
@@ -53,7 +53,7 @@ public class Pin : BaseEntity
 
     public void AddTag(Guid tagId)
     {
-        if(_tagIds.Contains(tagId)) return;
-        _tagIds.Add(tagId);
+        if(_pinTags.Any(pt => pt.TagId == tagId)) return;
+        _pinTags.Add(new PinTag(Id, tagId));
     }
 }

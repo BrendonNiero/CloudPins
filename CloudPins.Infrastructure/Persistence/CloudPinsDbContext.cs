@@ -32,5 +32,18 @@ public class CloudPinsDbContext : DbContext
         modelBuilder.Entity<Board>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Pin>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Tag>().HasQueryFilter(x => !x.IsDeleted);
+
+        modelBuilder.Entity<PinTag>(builder =>
+        {
+            builder.HasKey(pt => new { pt.PinId, pt.TagId });
+
+            builder.HasOne<Pin>()
+                .WithMany(p => p.PinTags)
+                .HasForeignKey(pt => pt.PinId);
+
+            builder.HasOne<Tag>()
+                .WithMany()
+                .HasForeignKey(pt => pt.TagId);
+        });
     }
 }

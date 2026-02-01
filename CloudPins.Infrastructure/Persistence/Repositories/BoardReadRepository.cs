@@ -42,7 +42,7 @@ public class BoardReadRepository : IBoardReadRepository
     {
         var boards = await _context.Boards
             .AsNoTracking()
-            .Where(b => !b.IsDeleted)
+            .Where(b => !b.IsDeleted && b.OwnerId == userId)
             .OrderByDescending(b => b.CreatedAt)
             .Select(b => new
             {
@@ -72,7 +72,7 @@ public class BoardReadRepository : IBoardReadRepository
                 b.IsPublic,
                 boardPins.Select(p => new BoardLastPinDto(p.ThumbnailUrl))
                         .ToList(),
-                pins.Count,
+                boardPins.Count,
                 b.CreatedAt
             );
         }).ToList();

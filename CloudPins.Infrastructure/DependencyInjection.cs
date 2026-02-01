@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddScoped<IPinRepository, PinRepository>();
+        services.AddScoped<ILikeRepository, LikeRepository>();
         services.AddScoped<IBoardRepository, BoardRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
