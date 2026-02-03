@@ -1,7 +1,9 @@
+using Amazon.S3;
 using CloudPins.Application.Common.Interfaces;
 using CloudPins.Infrastructure.Persistence;
 using CloudPins.Infrastructure.Persistence.Repositories;
 using CloudPins.Infrastructure.Security;
+using CloudPins.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +26,23 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(
             configuration.GetSection("Jwt")
         );
+
+        services.AddSingleton<IAmazonS3>(_ =>
+        {
+           var config = new AmazonS3Config
+           {
+               ServiceURL = configuration["Storage:ServiceUrl"],
+               ForcePathStyle = true
+           };
+
+           return new AmazonS3Client(
+                configuration["AWS_ACCESS_KEY_ID"],
+                configuration["AWS_SECRET_ACCESS_KEY"],
+                config
+           );
+        });
+
+        services.AddScoped<IStorageService, S3StorageService>();
 
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
