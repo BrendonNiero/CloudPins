@@ -5,7 +5,7 @@
 
 # dotenv files
 .env
-
+/localstack
 /learn
 
 # User-specific files
