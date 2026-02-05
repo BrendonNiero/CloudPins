@@ -1,4 +1,5 @@
 using CloudPins.Api.Common;
+using CloudPins.Api.Models.DTO;
 using CloudPins.Application.Pins.Create;
 using CloudPins.Application.Pins.GetAll;
 using CloudPins.Application.Pins.GetById;
@@ -39,11 +40,22 @@ public class PinsController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] CreatePinCommand command,
+        [FromBody] CreatePinRequest request,
         CancellationToken ct
     )
     {
         var currentUserId = HttpContext.GetUserId();
+
+        var command = new CreatePinCommand
+        {
+          BoardId = request.BoardId,
+          ImageStream = request.Image.OpenReadStream(),
+          ImageFileName = request.Image.FileName,
+          ImageContentType = request.Image.ContentType,
+          Title = request.Title,
+          Description = request.Description,
+          TagIds = request.TagIds
+        };
 
         var result = await _createHandler.Handle(command, currentUserId, ct);
 

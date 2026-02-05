@@ -8,17 +8,19 @@ public class CreatePinCommandHandler
 {
     private readonly IPinRepository _pinRepository;
     private readonly IBoardRepository _boardRepository;
-
+    private readonly IStorageService _storage;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreatePinCommandHandler(
         IPinRepository pinRepository,
         IBoardRepository boardRepository,
+        IStorageService storage,
         IUnitOfWork unitOfWork
     )
     {
         _pinRepository = pinRepository;
         _boardRepository = boardRepository;
+        _storage = storage;
         _unitOfWork = unitOfWork;
     }
 
@@ -34,11 +36,18 @@ public class CreatePinCommandHandler
         if(!boardExists)
             throw new NotFoundException("Board not found.");
 
+        var imageUrl = await _storage.UploadAsync(
+            command.ImageStream,
+            command.ImageFileName,
+            command.ImageContentType,
+            ct
+        );
+
         var pin = Pin.Create(
             ownerId: currentUserId,
             boardId: command.BoardId,
-            imageUrl: command.ImageUrl,
-            thumbNailUrl: command.ThumbNailUrl,
+            imageUrl: imageUrl,
+            thumbNailUrl: imageUrl,
             title: command.Title,
             description: command.Description,
             tagIds: command.TagIds ?? Enumerable.Empty<Guid>()
