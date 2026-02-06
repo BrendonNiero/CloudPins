@@ -26,6 +26,9 @@ public static class DependencyInjection
             configuration.GetSection("Jwt")
         );
 
+        services.Configure<StorageOptions>(
+            configuration.GetSection("Storage")
+        );
         services.AddSingleton<IAmazonS3>(_ =>
         {
            var config = new AmazonS3Config

@@ -27,7 +27,7 @@ public class S3StorageService : IStorageService
         CancellationToken ct
     )
     {
-        var key = $"pins/{Guid.NewGuid()}-{fileName}";
+        var key = $"pins/{Guid.NewGuid()}";
 
         var request = new PutObjectRequest
         {

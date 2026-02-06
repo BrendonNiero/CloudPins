@@ -40,7 +40,7 @@ public class PinsController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] CreatePinRequest request,
+        [FromForm] CreatePinRequest request,
         CancellationToken ct
     )
     {

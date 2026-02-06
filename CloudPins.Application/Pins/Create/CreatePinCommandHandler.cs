@@ -53,6 +53,9 @@ public class CreatePinCommandHandler
             tagIds: command.TagIds ?? Enumerable.Empty<Guid>()
         );
 
+        Console.WriteLine($"📌 {command.ImageStream.Position}");
+        Console.WriteLine($"🥟 {command.ImageStream.Length}");
+
         await _pinRepository.AddAsync(pin, ct);
         await _unitOfWork.SaveChangesAsync(ct);
 
