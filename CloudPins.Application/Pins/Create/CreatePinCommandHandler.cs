@@ -30,15 +30,12 @@ public class CreatePinCommandHandler
         CancellationToken ct
     )
     {
-        var boardExists = await _boardRepository
-        .ExistsAsync(command.BoardId, ct);
-
-        if(!boardExists)
+        var boardExists = await _boardRepository.ExistsAsync(command.BoardId, ct);
+        if (!boardExists)
             throw new NotFoundException("Board not found.");
 
         var imageUrl = await _storage.UploadAsync(
-            command.ImageStream,
-            command.ImageFileName,
+            command.ImageBytes,
             command.ImageContentType,
             ct
         );
@@ -52,9 +49,6 @@ public class CreatePinCommandHandler
             description: command.Description,
             tagIds: command.TagIds ?? Enumerable.Empty<Guid>()
         );
-
-        Console.WriteLine($"📌 {command.ImageStream.Position}");
-        Console.WriteLine($"🥟 {command.ImageStream.Length}");
 
         await _pinRepository.AddAsync(pin, ct);
         await _unitOfWork.SaveChangesAsync(ct);

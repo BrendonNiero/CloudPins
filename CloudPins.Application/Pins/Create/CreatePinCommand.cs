@@ -3,7 +3,7 @@ namespace CloudPins.Application.Pins.Create;
 public class CreatePinCommand
 {
     public Guid BoardId { get; init; }
-    public Stream ImageStream { get; init; } = default!;
+    public byte[] ImageBytes { get; init; } = default!;
     public string ImageFileName { get; init; } = string.Empty;
     public string ImageContentType { get; init; } = string.Empty;
 

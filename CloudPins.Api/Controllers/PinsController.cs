@@ -1,3 +1,5 @@
+using Amazon.S3;
+using Amazon.S3.Model;
 using CloudPins.Api.Common;
 using CloudPins.Api.Models.DTO;
 using CloudPins.Application.Pins.Create;
@@ -46,10 +48,13 @@ public class PinsController : ControllerBase
     {
         var currentUserId = HttpContext.GetUserId();
 
+        using var ms = new MemoryStream();
+        await request.Image.CopyToAsync(ms, ct);
+
         var command = new CreatePinCommand
         {
           BoardId = request.BoardId,
-          ImageStream = request.Image.OpenReadStream(),
+          ImageBytes = ms.ToArray(),
           ImageFileName = request.Image.FileName,
           ImageContentType = request.Image.ContentType,
           Title = request.Title,

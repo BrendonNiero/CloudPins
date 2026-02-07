@@ -22,6 +22,9 @@ dotnet ef migrations add NomeDaMigrationNova --project CloudPins.Infrastructure 
 dotnet ef database update --project CloudPins.Infrastructure --startup-project CloudPins.Api
 ```
 
+## Documentações importantes
+- [AWS-Sdks .NET](https://docs.localstack.cloud/aws/integrations/aws-sdks/net/#_top)
+
 ## 🚩 Bounded Context
 
 ### Entidades Principais

@@ -1,4 +1,3 @@
-using System.Net.Mime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using CloudPins.Application.Common.Interfaces;
@@ -21,19 +20,20 @@ public class S3StorageService : IStorageService
     }
 
     public async Task<string> UploadAsync(
-        Stream fileStream,
-        string fileName,
+        byte[] bytes,
         string contentType,
         CancellationToken ct
     )
     {
         var key = $"pins/{Guid.NewGuid()}";
 
+        using var stream = new MemoryStream(bytes);
+
         var request = new PutObjectRequest
         {
             BucketName = _options.BucketName,
             Key = key,
-            InputStream = fileStream,
+            InputStream = stream,
             ContentType = contentType,
             CannedACL = S3CannedACL.PublicRead
         };

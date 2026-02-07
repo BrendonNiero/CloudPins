@@ -3,8 +3,7 @@ namespace CloudPins.Application.Common.Interfaces;
 public interface IStorageService
 {
     Task<string> UploadAsync(
-        Stream fileStream,
-        string fileName,
+        byte[] bytes,
         string contentType,
         CancellationToken ct
     );

@@ -31,17 +31,17 @@ public static class DependencyInjection
         );
         services.AddSingleton<IAmazonS3>(_ =>
         {
-           var config = new AmazonS3Config
-           {
-               ServiceURL = configuration["Storage:ServiceUrl"],
-               ForcePathStyle = true
-           };
-
-           return new AmazonS3Client(
-                configuration["AWS_ACCESS_KEY_ID"],
-                configuration["AWS_SECRET_ACCESS_KEY"],
+            var storage = configuration.GetSection("Storage");
+            var config = new AmazonS3Config
+            {
+                ServiceURL = storage["ServiceUrl"],
+                ForcePathStyle = true
+            };  
+            return new AmazonS3Client(
+                storage["AWS_ACCESS_KEY_ID"],
+                storage["AWS_SECRET_ACCESS_KEY"],
                 config
-           );
+            );
         });
 
         services.AddScoped<IStorageService, S3StorageService>();
