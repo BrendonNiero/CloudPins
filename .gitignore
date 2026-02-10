@@ -8,6 +8,11 @@
 /localstack
 /learn
 
+dist/
+.vite/
+.cache/
+.eslintcache
+
 # User-specific files
 *.rsuser
 *.suo
