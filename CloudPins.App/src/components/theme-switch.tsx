@@ -3,6 +3,9 @@ import { VisuallyHidden } from "@react-aria/visually-hidden";
 import { SwitchProps, useSwitch } from "@heroui/switch";
 import clsx from "clsx";
 import { useTheme } from "@heroui/use-theme";
+import { MdLightMode } from "react-icons/md";
+import { FaMoon } from "react-icons/fa6";
+
 
 export interface ThemeSwitchProps {
   className?: string;
@@ -58,6 +61,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
               "w-auto h-auto",
               "bg-transparent",
               "rounded-lg",
+              "text-2xl",
               "flex items-center justify-center",
               "group-data-[selected=true]:bg-transparent",
               "!text-default-500",
@@ -70,9 +74,9 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
         })}
       >
         {isSelected ? (
-          <p>DARK</p>
+          <FaMoon />
         ) : (
-          <p>BRANCO</p>
+          <MdLightMode />
         )}
       </div>
     </Component>
