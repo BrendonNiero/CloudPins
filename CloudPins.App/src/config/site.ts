@@ -17,8 +17,12 @@ export const siteConfig = {
       href: "/login"
     },
     {
+      label: "Pin",
+      href: "/pin/[id]"
+    },
+    {
       label: "Explorar",
-      href: "/feeed/id"
+      href: "/feed"
     },
     {
       label: "Perfil",
@@ -35,12 +39,12 @@ export const siteConfig = {
       href: "/register"
     },
     {
-      label: "Entrar",
-      href: "/login"
+      label: "Pin",
+      href: "/pin/[id]"
     },
     {
       label: "Explorar",
-      href: "/feeed/id"
+      href: "/feed"
     },
     {
       label: "Perfil",
