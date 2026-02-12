@@ -5,15 +5,24 @@ import Profile from "@/pages/profile";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import Feed from "./pages/feed";
+import { ProtectedRoute } from "./routes/ProtectedRoute";
 
 function App() {
   return (
     <Routes>
       <Route element={<IndexPage />} path="/" />
-      <Route element={<Profile />} path="/profile" />
       <Route element={<Login />} path="/login" />
       <Route element={<Register />} path="/register" />
-      <Route element={<Feed />} path="/feed" />
+      <Route element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } path="/profile" />
+      <Route element={
+        <ProtectedRoute>
+          <Feed />
+        </ProtectedRoute>
+      } path="/feed" />
     </Routes>
   );
 }
