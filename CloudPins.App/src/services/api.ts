@@ -6,7 +6,8 @@ export async function apiFetch(
 ){
     const token = localStorage.getItem("token");
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    try {
+        const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers: {
             "Content-Type": "application/json",
@@ -15,7 +16,44 @@ export async function apiFetch(
         }
     });
 
-    if(!response.ok) throw new Error("Erro na requisição");
+    if(!response.ok){
+        let message = "Erro inesperado.";
+        switch(response.status)
+        {
+            case 400:
+                message = "Requisição inválida";
+                break;
+            case 401:
+                message = "Acesso negado."
+                break;
+            case 403:
+                message = "Acesso negado."
+                break;
+            case 404:
+                message = "Recurso não encontrado."
+                break;
+            case 500:
+                message = "Erro interno do servidor."
+                break;
+        }
+        throw {
+            status: response.status,
+            message,
+        };
 
-    return response.json();
+    }
+    if(response.status === 204) return null;
+
+    return await response.json();
+    }
+    catch(error: any)
+    {
+        if(!error.status){
+            throw {
+                status: 0,
+                message: "Não foi possível conectar com a API."
+            };
+        }
+        throw error;
+    }
 }
