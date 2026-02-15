@@ -1,5 +1,6 @@
 using System.Text;
 using CloudPins.Api.Common;
+using CloudPins.Api.Seed;
 using CloudPins.Application;
 using CloudPins.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -51,6 +52,11 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
+}
 
 var storageRoot = builder.Configuration["Storage:LocalRoot"];
 var bucket = builder.Configuration["Storage:BucketName"];
