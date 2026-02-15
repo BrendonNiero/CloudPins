@@ -3,6 +3,7 @@ using CloudPins.Api.Common;
 using CloudPins.Application;
 using CloudPins.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +51,22 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+var storageRoot = builder.Configuration["Storage:LocalRoot"];
+var bucket = builder.Configuration["Storage:BucketName"];
+
+var fullPath = Path.Combine(storageRoot!, bucket!);
+
+if(!Directory.Exists(fullPath))
+{
+    Directory.CreateDirectory(fullPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+   FileProvider = new PhysicalFileProvider(fullPath),
+   RequestPath = "/uploads"
+});
 
 if(app.Environment.IsDevelopment())
 {

@@ -29,23 +29,32 @@ public static class DependencyInjection
         services.Configure<StorageOptions>(
             configuration.GetSection("Storage")
         );
-        services.AddSingleton<IAmazonS3>(_ =>
+
+        var sotrageProvider = configuration["Storage:Provider"];
+
+        if(sotrageProvider == "Local")
         {
-            var storage = configuration.GetSection("Storage");
-            var config = new AmazonS3Config
+            services.AddScoped<IStorageService, FileSystemStorageService>();
+        } 
+        else
+        {
+            services.AddSingleton<IAmazonS3>(_ =>
             {
-                ServiceURL = storage["ServiceUrl"],
-                ForcePathStyle = true
-            };  
-            return new AmazonS3Client(
-                storage["AWS_ACCESS_KEY_ID"],
-                storage["AWS_SECRET_ACCESS_KEY"],
-                config
-            );
-        });
+                var storage = configuration.GetSection("Storage");
+                var config = new AmazonS3Config
+                {
+                    ServiceURL = storage["ServiceUrl"],
+                    ForcePathStyle = true
+                };  
+                return new AmazonS3Client(
+                    storage["AWS_ACCESS_KEY_ID"],
+                    storage["AWS_SECRET_ACCESS_KEY"],
+                    config
+                );
+            });
 
-        services.AddScoped<IStorageService, S3StorageService>();
-
+            services.AddScoped<IStorageService, S3StorageService>();
+        }
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddScoped<IPinRepository, PinRepository>();

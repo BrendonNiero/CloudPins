@@ -54,8 +54,8 @@ export default function Feed()
                     <Skeleton key={i} className="rounded-lg p-48" />
                 ))
             : feed.map((pin) => (
-                <img key={pin.id} src={pin.thumbnailUrl} 
-                    className="rounded-lg w-64 h-64 object-cover" />
+                <img src={`http://localhost:5023${pin.thumbnailUrl}`} 
+                className="rounded-lg w-64 h-64 object-cover" />
             ))}
             </section>
         </DefaultLayout>
