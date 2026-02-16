@@ -6,6 +6,7 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 import Feed from "./pages/feed";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
+import Explorer from "./pages/explorer";
 
 function App() {
   return (
@@ -23,6 +24,12 @@ function App() {
           <Feed />
         </ProtectedRoute>
       } path="/feed" />
+
+      <Route element={
+        <ProtectedRoute>
+          <Explorer />
+        </ProtectedRoute>
+      } path="/explorar/:id" />
     </Routes>
   );
 }

@@ -1,13 +1,9 @@
 import DefaultLayout from "@/layouts/default";
 import { getFeed } from "@/services/pinsService";
+import { Pin } from "@/types/pin";
 import { Link } from "@heroui/link";
 import {Skeleton} from "@heroui/skeleton";
 import { useState, useEffect, useRef, useCallback } from "react";
-
-type Pin = {
-    id: string;
-    thumbnailUrl: string;
-};
 
 export default function Feed()
 {
