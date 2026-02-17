@@ -29,39 +29,25 @@ dotnet ef database update --project CloudPins.Infrastructure --startup-project C
 ## 🚩 Bounded Context
 
 ### Entidades Principais
-|👦 Users |
-|----------|
+👦 Users 
 | Id | Name | Email | ProfileUrl |
 |----|------|-------|------------|
 | Guid | string | string | string |
-
 
  📁 Boards
 | Id | OwnerId | Name | Description | IsPublic |
 |----|---------|------|-------------|----------|
 | Guid | Guid | string | string | bool |
 
-- Id
-- OwnerdId
-- Name
-- Description
-- IsPublic
-
 📌 Pins
-- Id
-- OwnerdId
-- BoardId
-- ImageUrl
-- ThumbnailUrl
-- Title
-- Description
-- Tags
-- CreatedAt
-- LikesCount
+| Id | OwnerId | BoardId | ImageUrl | ThumbnailUrl | Title | Description | Tags | LikesCount |
+|----|---------|---------|----------|--------------|-------|-------------|------|------------|
+| Guid | Guid | Guid | string | string | string | string | string[] | int |
 
 ❤ Likes
-- UserId
-- PinId
+| UserId | PinId |
+|--------|-------|
+| Guid | Guid |
 
 ### ⚙ Relacionamentos 
 - Users -> Boards   (1:N)
