@@ -1,4 +1,5 @@
 # CloudPins 📌☁
+![Banner CloudPins](./assets/banner-cloudpins.png)
 CloudPins é uma plataforma de curadoria visual que permite organizar, salvar e descobrir novas imagens por meio de coleções.
 
 A plataforma foi projetada com foco em escalabilidade, separação de responsabilidades e armazenamento eficiente de mídia, utilizando arquitetura limpa, domínio bem definido e um modelo de leitura otimizado para feeds.
@@ -28,13 +29,18 @@ dotnet ef database update --project CloudPins.Infrastructure --startup-project C
 ## 🚩 Bounded Context
 
 ### Entidades Principais
-👦 Users
-- Id
-- Name
-- Email
-- ProfileUrl
+|👦 Users |
+|----------|
+| Id | Name | Email | ProfileUrl |
+|----|------|-------|------------|
+| Guid | string | string | string |
+
 
  📁 Boards
+| Id | OwnerId | Name | Description | IsPublic |
+|----|---------|------|-------------|----------|
+| Guid | Guid | string | string | bool |
+
 - Id
 - OwnerdId
 - Name

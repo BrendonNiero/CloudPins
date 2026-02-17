@@ -84,7 +84,7 @@ export default function Feed()
                 </Link>
             ))}
             </section>
-            { hasMore && (
+            { hasMore && !error && (
               <div ref={lastElementRef} className="flex justify-center my-10">
                 {loading && <Skeleton className="h-10 w-40 rounded-lg" />}
               </div>
