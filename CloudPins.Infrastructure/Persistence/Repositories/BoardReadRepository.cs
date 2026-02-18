@@ -63,15 +63,14 @@ public class BoardReadRepository : IBoardReadRepository
 
         return boards.Select(b =>
         {
-            var boardPins = pins.Where(p => p.BoardId == b.Id)
-                            .Take(3).ToList();
+            var boardPins = pins.Where(p => p.BoardId == b.Id).ToList();
 
             return new BoardListItemDto(
                 b.Id,
                 b.Name,
                 b.IsPublic,
                 boardPins.Select(p => new BoardLastPinDto(p.ThumbnailUrl))
-                        .ToList(),
+                        .Take(3).ToList(),
                 boardPins.Count,
                 b.CreatedAt
             );

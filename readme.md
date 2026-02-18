@@ -26,9 +26,8 @@ dotnet ef database update --project CloudPins.Infrastructure --startup-project C
 ## Documentações importantes
 - [AWS-Sdks .NET](https://docs.localstack.cloud/aws/integrations/aws-sdks/net/#_top)
 
-## 🚩 Bounded Context
+## 🎲 Tabelas do Banco
 
-### Entidades Principais
 👦 Users 
 | Id | Name | Email | ProfileUrl |
 |----|------|-------|------------|
@@ -44,15 +43,20 @@ dotnet ef database update --project CloudPins.Infrastructure --startup-project C
 |----|---------|---------|----------|--------------|-------|-------------|------|------------|
 | Guid | Guid | Guid | string | string | string | string | string[] | int |
 
+🏷 Tag
+| Id | Name |
+|----|------|
+| string | string |
+
+✒ PinTag
+| PinId | TagId |
+|-------|-------|
+| Guid | Guid |
+
 ❤ Likes
 | UserId | PinId |
 |--------|-------|
 | Guid | Guid |
-
-### ⚙ Relacionamentos 
-- Users -> Boards   (1:N)
-- Boards -> Pins    (1:N)
-- Pins -> Likes     (1:N)
 
 # 📲 Feed
 - Pins públicos

@@ -1,9 +1,11 @@
+using System.Text;
 using CloudPins.Application.Common.Interfaces;
 using CloudPins.Domain.Boards;
 using CloudPins.Domain.Pins;
 using CloudPins.Domain.Tags;
 using CloudPins.Domain.Users;
 using CloudPins.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace CloudPins.Api.Seed;
 public static class DatabaseSeeder
@@ -44,8 +46,10 @@ public static class DatabaseSeeder
         // CRAIR TAGS
         var tagAnime = new Tag("anime");
         var tagGames = new Tag("games");
+        var tagRoom = new Tag("room");
+        var tagSetup = new Tag("setup");
 
-        context.Tags.AddRange(tagAnime, tagGames);
+        context.Tags.AddRange(tagAnime, tagGames, tagRoom, tagSetup);
         await context.SaveChangesAsync();
 
         // CRIAR PINS
@@ -76,6 +80,13 @@ public static class DatabaseSeeder
                 CancellationToken.None
             );
 
+            var fileName = Path.GetFileNameWithoutExtension(file);
+            var tagName = new string(fileName.TakeWhile(c => !char.IsDigit(c)).ToArray());
+
+            var tag = await context.Tags.FirstOrDefaultAsync(t => t.Name == tagName);
+
+            if(tag is null) continue;
+            
             var pin = Pin.Create(
                 user.Id,
                 board.Id,
@@ -83,7 +94,9 @@ public static class DatabaseSeeder
                 imageUrl,
                 Path.GetFileNameWithoutExtension(file),
                 "Imagem criada por Seed",
-                []
+                [
+                    tag.Id
+                ]
             );
 
             context.Pins.Add(pin);
