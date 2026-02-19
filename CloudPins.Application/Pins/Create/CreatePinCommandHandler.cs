@@ -33,6 +33,7 @@ public class CreatePinCommandHandler
         var boardExists = await _boardRepository.ExistsAsync(command.BoardId, ct);
         if (!boardExists)
             throw new NotFoundException("Board not found.");
+            
 
         var imageUrl = await _storage.UploadAsync(
             command.ImageBytes,
