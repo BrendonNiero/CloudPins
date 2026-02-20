@@ -1,3 +1,3 @@
 namespace CloudPins.Application.Pins.GetById;
 
-public record GetPinByIdQuery(Guid PinId);
+public record GetPinByIdQuery(Guid PinId, Guid CurrentUserId);

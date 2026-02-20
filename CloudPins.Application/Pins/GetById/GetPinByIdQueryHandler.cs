@@ -12,10 +12,12 @@ public class GetPinByIdQueryHandler
         _pinReadRepository = pinReadRepository;
     }
 
-    public async Task<PinDetailsDto> Handle(GetPinByIdQuery query, CancellationToken ct)
+    public async Task<PinDetailsDto> Handle(
+        GetPinByIdQuery query, 
+        CancellationToken ct)
     {
         var pin = await _pinReadRepository
-            .GetByIdAsync(query.PinId, ct);
+            .GetByIdAsync(query.PinId, query.CurrentUserId, ct);
 
         if(pin is null)
             throw new NotFoundException("Pin not found.");

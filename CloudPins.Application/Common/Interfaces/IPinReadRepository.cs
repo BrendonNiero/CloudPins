@@ -6,7 +6,11 @@ namespace CloudPins.Application.Common.Interfaces;
 
 public interface IPinReadRepository
 {
-    Task<PinDetailsDto?> GetByIdAsync(Guid pinId, CancellationToken ct);
+    Task<PinDetailsDto?> GetByIdAsync(
+        Guid pinId, 
+        Guid currentUserId,
+        CancellationToken ct
+    );
 
     Task<List<PinFeedItemDto>> GetFeedAsync(
         int page,

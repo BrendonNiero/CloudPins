@@ -15,7 +15,11 @@ public class PinReadRepository : IPinReadRepository
         _context = context;
     }
 
-    public async Task<PinDetailsDto?> GetByIdAsync(Guid pinId, CancellationToken ct)
+    public async Task<PinDetailsDto?> GetByIdAsync(
+        Guid pinId, 
+        Guid currentUserId,
+        CancellationToken ct
+    )
     {
         return await _context.Pins
         .AsNoTracking()
@@ -31,7 +35,10 @@ public class PinReadRepository : IPinReadRepository
             Description = p.Description,
             LikesCount = p.LikesCount,
             TagIds = p.PinTags.Select(pt => pt.TagId).ToList(),
-            CreatedAt = p.CreatedAt
+            CreatedAt = p.CreatedAt,
+
+            IsLiked = _context.Likes
+                .Any(l => l.PinId == p.Id && l.UserId == currentUserId)
         })
         .FirstOrDefaultAsync(ct);
     }

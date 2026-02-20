@@ -9,6 +9,7 @@ public class PinDetailsDto
     public string ThumbnailUrl { get; init; } = string.Empty;
     public string Title { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
+    public bool IsLiked { get; init; }
 
     public IReadOnlyCollection<Guid> TagIds { get; init; } = [];
     public int LikesCount { get; init; }

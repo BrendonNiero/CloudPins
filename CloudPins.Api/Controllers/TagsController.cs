@@ -1,5 +1,6 @@
 using CloudPins.Application.Tags.Create;
 using CloudPins.Application.Tags.GetAll;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudPins.Api.Controllers;
@@ -17,6 +18,7 @@ public class TagsController : ControllerBase
         _getAllHandler = getAllHandler;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] CreateTagCommand command,
@@ -27,6 +29,7 @@ public class TagsController : ControllerBase
         return Ok(tag);
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {

@@ -77,7 +77,9 @@ public class PinsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
-        var pin = await _getByIdHandler.Handle(new GetPinByIdQuery(id), ct);
+        var currentUserId = HttpContext.GetUserId();
+        var pin = await _getByIdHandler
+            .Handle(new GetPinByIdQuery(id, currentUserId), ct);
         if(pin is null) return NotFound();
 
         return Ok(pin);
