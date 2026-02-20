@@ -13,7 +13,6 @@ public class GetProfileQueryHandler
     }
 
     public async Task<UserProfileDto> Handle(
-        GetProfileQuery query,
         Guid currentUserId,
         CancellationToken ct
     )

@@ -43,6 +43,31 @@ public class S3StorageService : IStorageService
         return $"{_options.ServiceUrl}/{_options.BucketName}/{key}";
     }
 
+    public async Task<string> UploadProfileAsync(
+        Guid userId,
+        byte[] bytes,
+        string contentType,
+        CancellationToken ct
+    )
+    {
+        var key = $"profiles/{userId}/{Guid.NewGuid()}";
+
+        using var stream = new MemoryStream(bytes);
+
+        var request = new PutObjectRequest
+        {
+            BucketName = _options.BucketName,
+            Key = key,
+            InputStream = stream,
+            ContentType = contentType,
+            CannedACL = S3CannedACL.PublicRead
+        };
+
+        await _s3.PutObjectAsync(request, ct);
+
+        return $"{_options.ServiceUrl}/{_options.BucketName}/{key}";
+    }
+
     public async Task DeleteAsync(string fileKey, CancellationToken ct)
     {
         var request = new DeleteObjectRequest

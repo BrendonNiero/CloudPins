@@ -26,6 +26,7 @@ public class BoardsController : ControllerBase
         _getAllHandler = getAllHandler;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] CreateBoardCommand command,
@@ -42,6 +43,7 @@ public class BoardsController : ControllerBase
         );
     }
 
+    [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {

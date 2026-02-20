@@ -1,25 +1,21 @@
 using CloudPins.Application.Common.Exceptions;
 using CloudPins.Application.Common.Interfaces;
-using CloudPins.Application.Common.Storage;
 
 namespace CloudPins.Application.Users.Update;
 
 public class UpdateProfileCommandHandler
 {
     private readonly IUserRepository _userRepository;
-    private readonly IUserReadRepository _userReadRepository;
     private readonly IStorageService _storage;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateProfileCommandHandler(
         IUserRepository userRepository,
-        IUserReadRepository userReadRepository,
         IStorageService storage,
         IUnitOfWork unitOfWork
     )
     {
         _userRepository = userRepository;
-        _userReadRepository = userReadRepository;
         _storage = storage;
         _unitOfWork = unitOfWork;
     }
@@ -39,13 +35,8 @@ public class UpdateProfileCommandHandler
 
         if(command.ImageBytes is not null)
         {
-            var key = StorageKeyBuilder.BuilderProfileImageKey(
+            var uploadResult = await _storage.UploadProfileAsync(
                 user.Id,
-                command.ImageFileName!
-            );
-
-            var uploadResult = await _storage.UploadAsync(
-                key,
                 command.ImageBytes,
                 command.ImageContentType!,
                 ct

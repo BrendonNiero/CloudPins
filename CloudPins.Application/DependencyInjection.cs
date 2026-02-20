@@ -9,7 +9,9 @@ using CloudPins.Application.Pins.UnlikePin;
 using CloudPins.Application.Tags.Create;
 using CloudPins.Application.Tags.GetAll;
 using CloudPins.Application.Users.Create;
+using CloudPins.Application.Users.Get;
 using CloudPins.Application.Users.Login;
+using CloudPins.Application.Users.Update;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudPins.Application;
@@ -40,6 +42,8 @@ public static class DependencyInjection
 
         // USERS 
         services.AddScoped<CreateUserCommandHandler>();
+        services.AddScoped<UpdateProfileCommandHandler>();
+        services.AddScoped<GetProfileQueryHandler>();
         services.AddScoped<LoginCommandHandler>();
 
         return services;

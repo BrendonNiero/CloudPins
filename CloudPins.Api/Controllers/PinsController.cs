@@ -8,6 +8,7 @@ using CloudPins.Application.Pins.GetById;
 using CloudPins.Application.Pins.GetFeed;
 using CloudPins.Application.Pins.LikePin;
 using CloudPins.Application.Pins.UnlikePin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudPins.Api.Controllers;
@@ -40,6 +41,7 @@ public class PinsController : ControllerBase
         _unlikePinHandler = unlikePinHandler;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromForm] CreatePinRequest request,
@@ -71,6 +73,7 @@ public class PinsController : ControllerBase
         );
     }
 
+    [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
     {
@@ -80,6 +83,7 @@ public class PinsController : ControllerBase
         return Ok(pin);
     }
 
+    [Authorize]
     [HttpGet("feed")]
     public async Task<IActionResult> GetFeed(CancellationToken ct)
     {
@@ -90,6 +94,7 @@ public class PinsController : ControllerBase
         return Ok(feed);
     }
 
+    [Authorize]
     [HttpGet("feed/{id:guid}")]
     public async Task<IActionResult> GetFeedByPin(Guid id, CancellationToken ct)
     {
@@ -100,6 +105,7 @@ public class PinsController : ControllerBase
         return Ok(feedByPin);
     }
 
+    [Authorize]
     [HttpPost("{id:guid}/like")]
     public async Task<IActionResult> LikePin(Guid id, CancellationToken ct)
     {
@@ -110,6 +116,7 @@ public class PinsController : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
     [HttpDelete("{id:guid}/like")]
     public async Task<IActionResult> UnlikePin(Guid id, CancellationToken ct)
     {

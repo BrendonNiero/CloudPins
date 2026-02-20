@@ -18,6 +18,12 @@ public class UserRepository : IUserRepository
         await _context.Users.AddAsync(user, ct);
     }
 
+    public async Task<User?> GetByIdAsync(Guid id, CancellationToken ct)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == id, ct);
+    }
+
     public async Task<User?> GetByEmailAsync(string email, CancellationToken ct)
     {
         return await _context.Users
