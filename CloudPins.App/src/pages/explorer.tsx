@@ -9,6 +9,8 @@ import { Skeleton } from "@heroui/skeleton";
 import { Pin } from "@/types/pin";
 import { getFeedExplorer } from "@/services/explorerService";
 import { Link } from "@heroui/link";
+import { likePin } from "@/services/likePinService";
+import { unlikePin } from "@/services/unlikePinService";
 
 
 export default function Explorer()
@@ -45,27 +47,27 @@ export default function Explorer()
         [loadingFeed, hasMore]
     );
 
-    useEffect(() => {
-        async function loadPinDetail()
-        {
-            try {
-                setLoadingDetail(true);
-                const data: PinDetail = await getPinDetail(id!);
+    async function loadPinDetail()
+    {
+        try {
+            setLoadingDetail(true);
+            const data: PinDetail = await getPinDetail(id!);
 
-                if(!data) setError("Erro ao carregar detalhes do Pin");
+            if(!data) setError("Erro ao carregar detalhes do Pin");
 
-                setPinDetail(data);
-            }
-            catch(error: any)
-            {
-                setError(error);
-            }
-            finally
-            {
-                setLoadingDetail(false);
-            }
+            setPinDetail(data);
         }
+        catch(error: any)
+        {
+            setError(error);
+        }
+        finally
+        {
+            setLoadingDetail(false);
+        }
+    }
 
+    useEffect(() => {
         async function loadExplorerFeed()
         {
             try {
@@ -103,6 +105,29 @@ export default function Explorer()
         })
     }, [id]);
 
+    async function HandleLikePin()
+    {
+        if(pinDetail?.isLiked) return;
+
+        if(pinDetail != null && id != null)
+        {
+            
+            await likePin(id);
+            loadPinDetail();
+        }
+    }
+
+    async function HandleUnlikePin()
+    {
+        if(!pinDetail?.isLiked) return;
+
+        if(pinDetail != null && id != null)
+        {
+            await unlikePin(id);
+            loadPinDetail();
+        }
+    }
+
 
     return(
         <DefaultLayout>
@@ -114,16 +139,22 @@ export default function Explorer()
                         <p>{pinDetail?.description}</p>
                         <div className="flex items-center justify-between mt-4">
                             <div className="flex items-center gap-2">
-                                <Button isIconOnly >
-                                    <FaHeart />
-                                </Button>
+                                {pinDetail?.isLiked ? 
+                                    <Button isIconOnly color="danger" onPress={HandleUnlikePin}>
+                                        <FaHeart />
+                                    </Button> 
+                                    : 
+                                    <Button isIconOnly onPress={HandleLikePin}>
+                                        <FaHeart />
+                                    </Button>
+                                }
                                 <span className="text-3xl">{pinDetail?.likesCount}</span>
                             </div>
-                            <Button color="primary" variant="shadow">Salvar</Button>
+                            <Button isDisabled color="primary" variant="shadow">Salvar</Button>
                         </div>
                     </div>
                  : 
-                    <div className="p-8 border border-default-500 w-[30%] rounded-xl flex flex-col gap-3">
+                    <div className="p-8 border border-default-500 w-full rounded-xl flex flex-col gap-3">
                         <Skeleton className="h-[400px] w-full rounded-md"/>
                         <Skeleton className="p-6 rounded-md w-full" />
                         <Skeleton className="p-3 rounded-md w-full" />

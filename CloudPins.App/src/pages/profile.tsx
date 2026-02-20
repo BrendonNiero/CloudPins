@@ -1,12 +1,16 @@
 import DefaultLayout from "@/layouts/default";
 import { getBoards } from "@/services/boardService";
+import { getProfile } from "@/services/profileService";
 import { Board } from "@/types/board";
+import { ProfileDetail } from "@/types/profileDetail";
 import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
 import { Link } from "@heroui/link";
 import { Skeleton } from "@heroui/skeleton";
 import { User } from "@heroui/user";
 import { useEffect, useState } from "react";
+import { FaPen } from "react-icons/fa";
+
 
 export default function Profile()
 {
@@ -14,6 +18,9 @@ export default function Profile()
     const [loadingBoards, setLoadingBoard] = useState(true);
     const [errorBoards, setErrorBoards] = useState("");
 
+    const [profile, setProfile] = useState<ProfileDetail>();
+    const [loadingProfile, setLoadingProfile] = useState(true);
+    const [errorProfile, setErrorProfile] = useState("");
 
     useEffect(() => {
         async function loadBoards()
@@ -37,18 +44,42 @@ export default function Profile()
                 setLoadingBoard(false);
             }
         }
+
+        async function loadProfile()
+        {
+            try {
+                setLoadingProfile(true);
+                const data = await getProfile();
+                setProfile(data);
+            }
+            catch(error: any)
+            {
+                setErrorProfile(error);
+            }
+            finally
+            {
+                setLoadingProfile(false)
+            }
+        }
+        loadProfile();
         loadBoards();
     }, []);
     return(
         <DefaultLayout>
             <div className="flex w-full items-center justify-between mb-5">
                 <h1 className="text-4xl font-bold">Suas Boards</h1>
-                <div className="flex items-center gap-5">
-                    <User avatarProps={{ src: "https://i.pinimg.com/736x/31/52/59/31525978bcee3d8f47f11f78be4df9c6.jpg"}}
-                        name="Brendon Berzins"
+                    { errorProfile 
+                    ? <h1>deu pau</h1>:
+                    loadingProfile 
+                    ? <Skeleton />
+                    : 
+                    <div className="flex items-center gap-5">
+                        <User avatarProps={{ src: `http://localhost:5023${profile?.profileUrl}`}}
+                        name={profile?.name}
                         description="3 Boards"/>
-                    <Button color="primary" variant="shadow">Editar</Button>
-                </div>
+                        <Button isIconOnly color="primary" variant="shadow"><FaPen /></Button>
+                    </div>
+                    }
             </div>
             <section>
                 <Button color="primary" variant="shadow">Nova Board</Button>

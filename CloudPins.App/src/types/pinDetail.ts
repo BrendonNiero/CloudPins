@@ -9,5 +9,6 @@ export type PinDetail =
     description: string;
     tagIds: string[];
     likesCount: number;
+    isLiked: boolean;
     createdAt: string;
 };

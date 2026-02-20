@@ -2,10 +2,37 @@ import { Input } from "@heroui/input";
 import { ThemeSwitch } from "./theme-switch";
 import { Link } from "@heroui/link";
 import { IoSearch } from "react-icons/io5";
+import { useEffect, useState } from "react";
+import { ProfileDetail } from "@/types/profileDetail";
+import { getProfile } from "@/services/profileService";
+import { Skeleton } from "@heroui/skeleton";
 
 
 export default function HeaderLogged()
 {
+    const [loading, setLoading] = useState(true);
+    const [profile, setProfile] = useState<ProfileDetail>();
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+        async function loadProfile()
+        {
+            try {
+                setLoading(true);
+                const data = await getProfile();
+                setProfile(data);
+            }
+            catch
+            {
+                setError(true);
+            }
+            finally
+            {
+                setLoading(false);
+            }
+        }
+        loadProfile();
+    }, []);
     return(
         <div className="flex items-center justify-between">
             <Link href="/feed">
@@ -14,9 +41,13 @@ export default function HeaderLogged()
             <Input placeholder="Pesquisar" startContent={<IoSearch />} className="max-w-[800px]" />
             <div className="flex items-center gap-5">
                 <ThemeSwitch />
-                <Link href="/profile">
-                    <img className="h-12 rounded-full" src="https://i.pinimg.com/736x/31/52/59/31525978bcee3d8f47f11f78be4df9c6.jpg" />
-                </Link>
+                {
+                    error ? <Skeleton className="h-12 w-12 rounded-full" /> :
+                    loading ? <Skeleton className="h-12 w-12 rounded-full" /> :
+                        <Link href="/profile">
+                        <img className="h-12 rounded-full" src={`http://localhost:5023${profile?.profileUrl}`} />
+                        </Link>
+                }
             </div>
         </div>
     );
