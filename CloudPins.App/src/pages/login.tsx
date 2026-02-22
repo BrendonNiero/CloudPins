@@ -38,9 +38,9 @@ export default function Login()
         <main className="p-5 h-screen overflow-hidden">
             <HeaderVisitant />
             <section className="h-full w-full flex items-center justify-center">
-                <Card className="min-w-[500px]">
+                <Card className="w-full md:max-w-[500px]">
                     <CardBody className="flex flex-col items-center justify-center text-center p-7">
-                        <img src="/cloudpins.png" className="h-16 w-16 rounded-xl mb-5"/>
+                        <img src="/cloudpins.png" className="h-12 w-12 md:h-16 md:w-16 rounded-xl mb-5"/>
                         <h4 className="text-3xl">Entrar em sua conta</h4>
                         <p className="text-default-500 mb-5">Realize o acesso a sua conta existente</p>
                         <div className="flex flex-col gap-3 w-full border-b border-b-default-500 pb-5">

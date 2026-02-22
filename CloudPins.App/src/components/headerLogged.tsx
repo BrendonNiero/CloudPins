@@ -34,18 +34,18 @@ export default function HeaderLogged()
         loadProfile();
     }, []);
     return(
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-5">
             <Link href="/feed">
-                <img src="/cloudpins.png" className="h-12 w-12 rounded-xl"/>
+                <img src="/cloudpins.png" className="h-10 min-w-10 md:h-12 md:min-w-12 rounded-xl"/>
             </Link>
-            <Input placeholder="Pesquisar" startContent={<IoSearch />} className="max-w-[800px]" />
+            <Input placeholder="Pesquisar" startContent={<IoSearch />} className="w-full md:max-w-[600px] lg:max-w-[800px]" />
             <div className="flex items-center gap-5">
                 <ThemeSwitch />
                 {
                     error ? <Skeleton className="h-12 w-12 rounded-full" /> :
                     loading ? <Skeleton className="h-12 w-12 rounded-full" /> :
                         <Link href="/profile">
-                        <img className="h-12 rounded-full" src={`http://localhost:5023${profile?.profileUrl}`} />
+                        <img className="h-10 min-w-10 md:h-12 md:min-w-12 rounded-full" src={`http://localhost:5023${profile?.profileUrl}`} />
                         </Link>
                 }
             </div>

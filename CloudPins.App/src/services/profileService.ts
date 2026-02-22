@@ -7,5 +7,5 @@ export async function getProfile()
 
 export async function updateProfile(formData: FormData)
 {
-    return apiFetch("/user", { method: "PUT", body: formData })
+    return apiFetch("/user", { method: "PUT", body: formData });
 }

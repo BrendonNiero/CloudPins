@@ -14,7 +14,6 @@ import { Modal, ModalBody, ModalContent, ModalFooter, useDisclosure  } from "@he
 import { Input } from "@heroui/input";
 import {Badge} from "@heroui/badge";
 import { FaCamera } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 
 
 export default function Profile()
@@ -127,12 +126,12 @@ export default function Profile()
     }
     return(
         <DefaultLayout>
-            <div className="flex w-full items-center justify-between mb-5">
+            <div className="flex w-full items-center justify-between mb-5 flex-wrap gap-5">
                 <h1 className="text-4xl font-bold">Suas Boards</h1>
                     { errorProfile 
-                    ? <h1>deu pau</h1>:
+                    ? <Skeleton className="w-48 h-12 rounded-xl"/> :
                     loadingProfile 
-                    ? <Skeleton />
+                    ? <Skeleton className="w-48 h-12 rounded-xl"/>
                     : 
                     <div className="flex items-center gap-5">
                         <User avatarProps={{ src: `http://localhost:5023${profile?.profileUrl}?t=${Date.now()}`}}
@@ -144,7 +143,7 @@ export default function Profile()
             </div>
             <section>
                 <Button color="primary" variant="shadow">Nova Board</Button>
-                <div className="flex items-center gap-5 mt-5">
+                <div className="flex items-center flex-wrap gap-5 mt-5">
                     {errorBoards && <h1>{errorBoards}</h1>}
                     {loadingBoards ?
                         Array.from({ length: 3}).map((_, i) => (
@@ -152,7 +151,7 @@ export default function Profile()
                         ))
                         : boards.map((board) => (
                             <div key={board.id}>
-                                <Link href="/">
+                                <Link href={`/board/${board.id}`}>
                                     <Card className="p-3 rounded-2xl overflow-hidden">
                                         <div className="grid grid-cols-3 grid-rows-2 gap-4 h-52">
                                             {board.lastPins.slice(0, 3).map((lastPin, i) => {
@@ -177,7 +176,7 @@ export default function Profile()
                     }
                 </div>
             </section>
-            <Modal backdrop="blur" isOpen={isOpen} placement="top-center" onClose={handleModalProfileClose} onOpenChange={onOpenChange}>
+            <Modal backdrop="blur" isOpen={isOpen} placement="bottom-center" onClose={handleModalProfileClose} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>

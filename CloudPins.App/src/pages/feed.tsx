@@ -1,3 +1,4 @@
+import ErrorMensage from "@/components/errorMensage";
 import DefaultLayout from "@/layouts/default";
 import { getFeed } from "@/services/pinsService";
 import { Pin } from "@/types/pin";
@@ -68,9 +69,7 @@ export default function Feed()
                 <Link href="/feed" underline="hover" color="foreground">UI/UX</Link>
             </ul>
             {error && (
-                <section className="h-full text-center mt-64 w-full flex items-center justify-center">
-                    <h3 className="text-4xl">{error}</h3>
-                </section>
+                <ErrorMensage error={error}/>
             )}
             <section className="columns-2 sm:col-end-3 md:columns-4 lg:columns-5 gap-3 space-y-3 mt-5">
                 {loading ? 

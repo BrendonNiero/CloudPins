@@ -7,6 +7,7 @@ import Register from "./pages/register";
 import Feed from "./pages/feed";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import Explorer from "./pages/explorer";
+import BoardPins from "./pages/boardPins";
 
 function App() {
   return (
@@ -30,6 +31,11 @@ function App() {
           <Explorer />
         </ProtectedRoute>
       } path="/explorar/:id" />
+      <Route element={
+        <ProtectedRoute>
+          <BoardPins />
+        </ProtectedRoute>
+      } path="/board/:id"/>
     </Routes>
   );
 }
