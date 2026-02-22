@@ -1,6 +1,6 @@
 import DefaultLayout from "@/layouts/default";
 import { getBoards } from "@/services/boardService";
-import { getProfile } from "@/services/profileService";
+import { getProfile, updateProfile } from "@/services/profileService";
 import { Board } from "@/types/board";
 import { ProfileDetail } from "@/types/profileDetail";
 import { Button } from "@heroui/button";
@@ -8,8 +8,13 @@ import { Card } from "@heroui/card";
 import { Link } from "@heroui/link";
 import { Skeleton } from "@heroui/skeleton";
 import { User } from "@heroui/user";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaPen } from "react-icons/fa";
+import { Modal, ModalBody, ModalContent, ModalFooter, useDisclosure  } from "@heroui/modal";
+import { Input } from "@heroui/input";
+import {Badge} from "@heroui/badge";
+import { FaCamera } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 
 export default function Profile()
@@ -21,6 +26,33 @@ export default function Profile()
     const [profile, setProfile] = useState<ProfileDetail>();
     const [loadingProfile, setLoadingProfile] = useState(true);
     const [errorProfile, setErrorProfile] = useState("");
+
+    const [editedName, setEditedName] = useState("");
+    // PARA SELECT IMAGE
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    // MODAL PROFILE
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    async function loadProfile()
+    {
+        try {
+            setLoadingProfile(true);
+            const data = await getProfile();
+            setProfile(data);
+            setEditedName(data.name);
+        }
+        catch(error: any)
+        {
+            setErrorProfile(error);
+        }
+        finally
+        {
+            setLoadingProfile(false)
+        }
+    }
 
     useEffect(() => {
         async function loadBoards()
@@ -44,26 +76,55 @@ export default function Profile()
                 setLoadingBoard(false);
             }
         }
-
-        async function loadProfile()
-        {
-            try {
-                setLoadingProfile(true);
-                const data = await getProfile();
-                setProfile(data);
-            }
-            catch(error: any)
-            {
-                setErrorProfile(error);
-            }
-            finally
-            {
-                setLoadingProfile(false)
-            }
-        }
         loadProfile();
         loadBoards();
     }, []);
+    
+    const handleClickSelectImage = () => {
+        if(fileInputRef.current){
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        if(!profile) return;
+
+        const formData = new FormData();
+        formData.append("Name", editedName);
+        if(selectedFile)
+            formData.append("Image", selectedFile);
+
+        await updateProfile(formData);
+        await loadProfile();
+
+        // LIMPA PREVIEW E SELECTEDFILE
+        setPreviewUrl(null);
+        setSelectedFile(null);
+        onOpenChange();
+    };
+
+    // Evita memory leak
+    useEffect(() => {
+        return () => {
+            if(previewUrl){
+                URL.revokeObjectURL(previewUrl);
+            };
+        }
+    }, [previewUrl]);
+
+    // CONTROLA ABERTURA E FECHAMENTO DE MODAL
+    function handleModalProfileClose()
+    {
+        setPreviewUrl(null);
+        setSelectedFile(null);
+    }
+    function handleModalProfileOpen()
+    {
+            if(profile){
+            setEditedName(profile.name);
+        }
+        onOpenChange();
+    }
     return(
         <DefaultLayout>
             <div className="flex w-full items-center justify-between mb-5">
@@ -74,10 +135,10 @@ export default function Profile()
                     ? <Skeleton />
                     : 
                     <div className="flex items-center gap-5">
-                        <User avatarProps={{ src: `http://localhost:5023${profile?.profileUrl}`}}
+                        <User avatarProps={{ src: `http://localhost:5023${profile?.profileUrl}?t=${Date.now()}`}}
                         name={profile?.name}
                         description="3 Boards"/>
-                        <Button isIconOnly color="primary" variant="shadow"><FaPen /></Button>
+                        <Button  onPress={handleModalProfileOpen} isIconOnly color="primary" variant="shadow"><FaPen /></Button>
                     </div>
                     }
             </div>
@@ -116,6 +177,44 @@ export default function Profile()
                     }
                 </div>
             </section>
+            <Modal backdrop="blur" isOpen={isOpen} placement="top-center" onClose={handleModalProfileClose} onOpenChange={onOpenChange}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalBody>
+                                <div className="w-full flex items-center justify-center mt-10 mb-5">
+                                    <input onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if(file){ 
+                                            setSelectedFile(file);
+                                            const preview = URL.createObjectURL(file);
+                                            setPreviewUrl(preview);
+                                        }
+                                    }}
+                                    type="file" accept="image/*" ref={fileInputRef}
+                                    className="hidden" />
+                                    <div className="cursor-pointer hover:opacity-80 transition ease-in-out" onClick={handleClickSelectImage}>
+                                        <Badge 
+                                         placement="bottom-right" content={<div className="py-3 px-2"><FaCamera /></div>} size="lg">
+                                            <img src={
+                                                previewUrl ? previewUrl :
+                                                `http://localhost:5023${profile?.profileUrl}?t=${Date.now()}`
+                                            } className="w-24 h-24 rounded-full"/>
+                                        </Badge>
+                                    </div>
+                                </div>
+                                <Input value={editedName}
+                                onChange={(e) => setEditedName(e.target.value)}
+                                label="Nome de usuário" />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button onPress={onClose}>Cancelar</Button>
+                                <Button onPress={handleSaveProfile} color="primary" variant="shadow">Salvar</Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </DefaultLayout>
     );
 }

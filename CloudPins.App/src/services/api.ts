@@ -6,12 +6,14 @@ export async function apiFetch(
 ){
     const token = localStorage.getItem("token");
 
+    const isFormData = options?.body instanceof FormData;
+
     try {
         const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers: {
-            "Content-Type": "application/json",
             ...(token && { Authorization: `Bearer ${token}` }),
+            ...(!isFormData && { "Content-Type": "application/json" }),
             ...options?.headers
         }
     });

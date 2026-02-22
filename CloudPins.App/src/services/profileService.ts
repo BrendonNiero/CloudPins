@@ -5,7 +5,7 @@ export async function getProfile()
     return apiFetch("/user");
 }
 
-export async function updateProfile(name: string, profileImage: ImageData)
+export async function updateProfile(formData: FormData)
 {
-    return apiFetch("/user", { method: "PUT", body: JSON.stringify(name)})
+    return apiFetch("/user", { method: "PUT", body: formData })
 }
