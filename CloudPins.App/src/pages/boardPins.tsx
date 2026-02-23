@@ -12,7 +12,7 @@ import { Modal, ModalBody, ModalContent, ModalFooter, useDisclosure  } from "@he
 import { createPin } from "@/services/pinsService";
 import { Tag } from "@/types/tag";
 import { getTags } from "@/services/tagsService";
-import { Input } from "@heroui/input";
+import { Input, Textarea } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Card } from "@heroui/card";
 import { Chip } from "@heroui/chip";
@@ -148,9 +148,11 @@ export default function BoardPins()
                                             <Chip key={tag.id} onClose={(() => console.log(tag.name))}>{tag.name}</Chip>
                                         ))}
                                     </div>
-                                    <Select placeholder="Selecione Tags">
-                                        { (tags ?? []).map((tag) => <SelectItem key={tag.id}>{tag.name}</SelectItem>)}
+                                    <Select placeholder="Selecione Tags" items={tags}>
+                                        {tags?.map((tag) => <SelectItem key={tag.id}>{tag.name}</SelectItem>)}
                                     </Select>
+                                    <Input placeholder="Título do Pin" />
+                                    <Textarea placeholder="Descrição" />
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button onPress={onClose}>Cancelar</Button>
