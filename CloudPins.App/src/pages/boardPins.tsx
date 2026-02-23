@@ -11,12 +11,19 @@ import { FaPlus } from "react-icons/fa";
 import { Modal, ModalBody, ModalContent, ModalFooter, useDisclosure  } from "@heroui/modal";
 import { createPin } from "@/services/pinsService";
 import { Tag } from "@/types/tag";
+import { getTags } from "@/services/tagsService";
+import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
+import { Card } from "@heroui/card";
+import { Chip } from "@heroui/chip";
 
 export default function BoardPins()
 {
     const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState(false);
+    const [loadingTags, setLoadingTags] = useState(false);
     const [pins, setPins] = useState<Pin[]>([]);
+    const [tags, setTags] = useState<Tag[]>();
     const [error, setError] = useState("");
 
     // PARA CRIAR NOVO PIN
@@ -51,8 +58,27 @@ export default function BoardPins()
         }
     }
 
+    async function loadTags()
+    {
+        try
+        {
+            setLoadingTags(true);
+            const data: Tag[] = await getTags();
+            setTags(data);
+        }
+        catch(error: any)
+        {
+            //
+        }
+        finally
+        {
+            setLoadingTags(false);
+        }
+    }
+
     useEffect(() => {
         loadPins();
+        loadTags();
     }, []);
 
     // FUNÇÕES AUXILIARES PARA CRIAÇÃO DE PIN
@@ -63,7 +89,7 @@ export default function BoardPins()
         }
     };
 
-    const handleCreatePin = async () => {
+    async function handleSaveCreatePin(){
         const formData = new FormData();
         formData.append("Title", pinTitle);
         if(selectedFile)
@@ -77,15 +103,22 @@ export default function BoardPins()
         setSelectedFile(null);
         setPinTitle("");
         onOpenChange();
-
-
     }
+
+    function handleModalCreatePinClose()
+    {
+        setPreviewUrl(null);
+        setSelectedFile(null);
+        setPinTitle("");
+    }
+
     return(
         <DefaultLayout>
             { error &&  <ErrorMensage error={error}/>}
             {!error &&
             <>
-                <Button startContent={<FaPlus />} variant="shadow" color="primary">Criar novo Pin</Button>
+                <Button onPress={onOpenChange}
+                    startContent={<FaPlus />} variant="shadow" color="primary">Criar novo Pin</Button>
                 <section className="columns-2 sm:col-end-3 md:columns-3 lg:columns-5 gap-3 space-y-3 mt-5">
                     { loading ?
                     Array.from({ length: 20}).map((_, i) => (
@@ -99,6 +132,34 @@ export default function BoardPins()
                         ))
                     }
                 </section>
+                <Modal backdrop="blur" isOpen={isOpen} placement="bottom-center" 
+                    onClose={handleModalCreatePinClose} onOpenChange={onOpenChange}>
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalBody>
+                                    <Card onClick={handleClickSelectImage}
+                                        className="mt-10 hover:opacity-80 transition ease-in-out cursor-pointer flex items-center justify-center p-10">
+                                        <h2 className="text-2xl font-bold">Adicione sua imagem aqui</h2>
+                                        <p>Somente JPEG, PNG ou WEBP serão aceitos.</p>
+                                    </Card>
+                                    <div className="mt-5 flex gap-3 flex-wrap">
+                                        {tags?.map((tag) => (
+                                            <Chip key={tag.id} onClose={(() => console.log(tag.name))}>{tag.name}</Chip>
+                                        ))}
+                                    </div>
+                                    <Select placeholder="Selecione Tags">
+                                        { (tags ?? []).map((tag) => <SelectItem key={tag.id}>{tag.name}</SelectItem>)}
+                                    </Select>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button onPress={onClose}>Cancelar</Button>
+                                    <Button onPress={onClose} color="primary" variant="shadow">Salvar</Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
             </>
             }
         </DefaultLayout>
