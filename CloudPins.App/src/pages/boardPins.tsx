@@ -30,6 +30,7 @@ export default function BoardPins()
     const [pinTitle, setPinTitle] = useState("");
     const [pinDescription, setPinDescription] = useState("");
     const [tagsPin, setTagsPin] = useState<string[]>([]);
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -92,6 +93,12 @@ export default function BoardPins()
     async function handleSaveCreatePin(){
         const formData = new FormData();
         formData.append("Title", pinTitle);
+        formData.append("Description", pinDescription);
+        tagsPin.forEach(tagId => {
+            formData.append("TagIds", tagId);
+        });
+        formData.append("BoardId", id!);
+
         if(selectedFile)
             formData.append("Image", selectedFile);
 
@@ -102,6 +109,8 @@ export default function BoardPins()
         setPreviewUrl(null);
         setSelectedFile(null);
         setPinTitle("");
+        setPinDescription("");
+        setTagsPin([]);
         onOpenChange();
     }
 
@@ -109,7 +118,24 @@ export default function BoardPins()
     {
         setPreviewUrl(null);
         setSelectedFile(null);
+        setTagsPin([]);
         setPinTitle("");
+        setPinDescription("");
+    }
+
+    // TRABALHANDO COM TAGS
+    function handleToggleTag(tagId: string)
+    {
+        setTagsPin((prev) => {
+            if(prev.includes(tagId))
+            {
+                return prev.filter(id => id !== tagId);
+            }
+            else 
+            {
+                return [...prev, tagId];
+            }
+        });
     }
 
     return(
@@ -138,25 +164,43 @@ export default function BoardPins()
                         {(onClose) => (
                             <>
                                 <ModalBody>
-                                    <Card onClick={handleClickSelectImage}
+                                    <Card isPressable onClick={handleClickSelectImage}
                                         className="mt-10 hover:opacity-80 transition ease-in-out cursor-pointer flex items-center justify-center p-10">
+                                        {previewUrl ?
+                                        <img src={previewUrl}  className="max-h-60 rounded-xl"/> :
+                                        <>
                                         <h2 className="text-2xl font-bold">Adicione sua imagem aqui</h2>
                                         <p>Somente JPEG, PNG ou WEBP serão aceitos.</p>
+                                        </>
+                                        }
                                     </Card>
+                                    <input onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if(file){
+                                            setSelectedFile(file)
+                                            const preview = URL.createObjectURL(file);
+                                            setPreviewUrl(preview);
+                                        }
+                                    }}
+                                    type="file" accept="image/*" ref={fileInputRef} className="hidden" />
                                     <div className="mt-5 flex gap-3 flex-wrap">
-                                        {tags?.map((tag) => (
-                                            <Chip key={tag.id} onClose={(() => console.log(tag.name))}>{tag.name}</Chip>
-                                        ))}
+                                        {tags?.map((tag) => {
+                                            const isSelected = tagsPin.includes(tag.id);
+                                            return (
+                                                <Chip onClick={() => handleToggleTag(tag.id)}
+                                                variant={isSelected ? "shadow" : "flat"}
+                                                color={isSelected ? "primary" : "default"}
+                                                className="cursor-pointer" 
+                                                key={tag.id}>{tag.name}</Chip>
+                                            );
+                                        })}
                                     </div>
-                                    <Select placeholder="Selecione Tags" items={tags}>
-                                        {tags?.map((tag) => <SelectItem key={tag.id}>{tag.name}</SelectItem>)}
-                                    </Select>
-                                    <Input placeholder="Título do Pin" />
-                                    <Textarea placeholder="Descrição" />
+                                    <Input placeholder="Título do Pin" value={pinTitle} onChange={(e) => setPinTitle(e.target.value)}/>
+                                    <Textarea placeholder="Descrição" value={pinDescription} onChange={(e) => setPinDescription(e.target.value)}/>
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button onPress={onClose}>Cancelar</Button>
-                                    <Button onPress={onClose} color="primary" variant="shadow">Salvar</Button>
+                                    <Button onPress={handleSaveCreatePin} color="primary" variant="shadow">Salvar</Button>
                                 </ModalFooter>
                             </>
                         )}
