@@ -1,5 +1,5 @@
 import DefaultLayout from "@/layouts/default";
-import { getBoards } from "@/services/boardService";
+import { createBoard, getBoards } from "@/services/boardService";
 import { getProfile, updateProfile } from "@/services/profileService";
 import { Board } from "@/types/board";
 import { ProfileDetail } from "@/types/profileDetail";
@@ -14,7 +14,9 @@ import { Modal, ModalBody, ModalContent, ModalFooter, useDisclosure  } from "@he
 import { Input } from "@heroui/input";
 import {Badge} from "@heroui/badge";
 import { FaCamera } from "react-icons/fa";
-
+import { Checkbox } from "@heroui/checkbox";
+import { cn } from "@heroui/theme";
+import { FaLock } from "react-icons/fa";
 
 export default function Profile()
 {
@@ -33,7 +35,17 @@ export default function Profile()
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     // MODAL PROFILE
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen: isProfileOpen, onOpen: onProfileOpen, 
+        onOpenChange: onProfileOpenChange } = useDisclosure();
+
+    // MODAL BOARD
+    const { isOpen: isBoardOpen, onOpen: onBoardOpen,
+            onOpenChange: onBoardOpenChange } = useDisclosure();
+
+    // PARA CRIAR BOARD 
+    const [isBoardPrivate, setIsBoardPrivate] = useState(false);
+    const [boardName, setBoardName] = useState("");
+    const [boardError, setBoardError] = useState("");
 
     async function loadProfile()
     {
@@ -53,28 +65,28 @@ export default function Profile()
         }
     }
 
-    useEffect(() => {
-        async function loadBoards()
-        {
-            try {
-                setLoadingBoard(true);
-                const data: Board[] = await getBoards();
-
-                if(data.length === 0)
-                {
-                    setErrorBoards("Você ainda não possui boards");
-                }
-                setBoards(data);
-            }
-            catch(error: any)
+    async function loadBoards()
+    {
+        try {
+            setLoadingBoard(true);
+            const data: Board[] = await getBoards();
+            if(data.length === 0)
             {
-                setErrorBoards(error.message);
+                setErrorBoards("Você ainda não possui boards");
             }
-            finally
-            {
-                setLoadingBoard(false);
-            }
+            setBoards(data);
         }
+        catch(error: any)
+        {
+            setErrorBoards(error.message);
+        }
+        finally
+        {
+            setLoadingBoard(false);
+        }
+    }
+
+    useEffect(() => {
         loadProfile();
         loadBoards();
     }, []);
@@ -99,7 +111,7 @@ export default function Profile()
         // LIMPA PREVIEW E SELECTEDFILE
         setPreviewUrl(null);
         setSelectedFile(null);
-        onOpenChange();
+        onProfileOpenChange();
     };
 
     // Evita memory leak
@@ -122,8 +134,36 @@ export default function Profile()
             if(profile){
             setEditedName(profile.name);
         }
-        onOpenChange();
+        onProfileOpen();
     }
+
+    function handleModalBoardClose(){
+        setBoardName("");
+        setBoardError("");
+        setIsBoardPrivate(false);
+    }
+    function handleModalBoardOpen(){
+        onBoardOpen();
+    }
+    
+    async function handleSaveBoard()
+    {
+        setBoardError("");
+        if(!boardName)
+        {
+            setBoardError("Preencha o nome da Board");
+            return;
+        }
+
+        var isPublic = !isBoardPrivate;
+        var name = boardName;
+
+        await createBoard({ name, isPublic });
+        handleModalBoardClose();
+        onBoardOpenChange();
+        loadBoards();
+    }
+
     return(
         <DefaultLayout>
             <div className="flex w-full items-center justify-between mb-5 flex-wrap gap-5">
@@ -142,7 +182,7 @@ export default function Profile()
                     }
             </div>
             <section>
-                <Button color="primary" variant="shadow">Nova Board</Button>
+                <Button color="primary" variant="shadow" onPress={handleModalBoardOpen}>Nova Board</Button>
                 <div className="flex items-center flex-wrap gap-5 mt-5">
                     {errorBoards && <h1>{errorBoards}</h1>}
                     {loadingBoards ?
@@ -153,7 +193,8 @@ export default function Profile()
                             <div key={board.id}>
                                 <Link href={`/board/${board.id}`}>
                                     <Card className="p-3 rounded-2xl overflow-hidden">
-                                        <div className="grid grid-cols-3 grid-rows-2 gap-4 h-52">
+                                        {!board.isPublic && <Card className="p-4 rounded-full absolute"><FaLock className="text-default-800"/></Card>}
+                                        <div className="grid grid-cols-3 grid-rows-2 gap-4 h-52 min-w-60">
                                             {board.lastPins.slice(0, 3).map((lastPin, i) => {
                                                 if(i === 0){
                                                     return(
@@ -176,7 +217,7 @@ export default function Profile()
                     }
                 </div>
             </section>
-            <Modal backdrop="blur" isOpen={isOpen} placement="bottom-center" onClose={handleModalProfileClose} onOpenChange={onOpenChange}>
+            <Modal backdrop="blur" isOpen={isProfileOpen} placement="bottom-center" onClose={handleModalProfileClose} onOpenChange={onProfileOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -209,6 +250,37 @@ export default function Profile()
                             <ModalFooter>
                                 <Button onPress={onClose}>Cancelar</Button>
                                 <Button onPress={handleSaveProfile} color="primary" variant="shadow">Salvar</Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            <Modal backdrop="blur" isOpen={isBoardOpen} placement="bottom-center" onClose={handleModalBoardClose} onOpenChange={onBoardOpenChange}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalBody>
+                                <Input className="mt-10 mb-2" placeholder="Nome da Board" onChange={(e) => setBoardName(e.target.value)}/>
+                                <Checkbox isSelected={isBoardPrivate} onValueChange={setIsBoardPrivate}
+                                      classNames={{
+                                      base: cn(
+                                        "inline-flex w-full max-w-md bg-content1",
+                                        "hover:bg-content2 items-center justify-start",
+                                        "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                        "data-[selected=true]:border-primary",
+                                      ),
+                                      label: "w-full",
+                                    }}>
+                                    <div className="flex gap-2 items-center">
+                                        <Card className="p-3 rounded-full"><FaLock className="text-default-500"/></Card>
+                                        <p>Tornar Privado</p>
+                                    </div>
+                                </Checkbox>
+                                {boardError && <p className="text-red-500">{boardError}</p>}
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button onPress={onClose}>Cancelar</Button>
+                                <Button onPress={handleSaveBoard} color="primary" variant="shadow">Salvar</Button>
                             </ModalFooter>
                         </>
                     )}
