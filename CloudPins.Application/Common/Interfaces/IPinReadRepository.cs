@@ -12,6 +12,13 @@ public interface IPinReadRepository
         CancellationToken ct
     );
 
+    Task<List<PinFeedItemDto>> GetSearchFeed(
+        string search,
+        int page,
+        int pageSize,
+        CancellationToken ct
+    );
+
     Task<List<PinFeedItemDto>> GetFeedAsync(
         int page,
         int pageSize,

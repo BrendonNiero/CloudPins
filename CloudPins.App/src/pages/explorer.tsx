@@ -11,6 +11,7 @@ import { getFeedExplorer } from "@/services/explorerService";
 import { Link } from "@heroui/link";
 import { likePin } from "@/services/likePinService";
 import { unlikePin } from "@/services/unlikePinService";
+import { FaBookmark } from "react-icons/fa";
 
 
 export default function Explorer()
@@ -133,9 +134,9 @@ export default function Explorer()
         <DefaultLayout>
             <section className="columns-2 sm:col-end-3 md:columns-4 gap-3 space-y-3">
                 {!loadingDetail ?
-                    <div className="p-8 border border-default-500 w-full rounded-xl break-inside-avoid">
+                    <div className="p-3 sm:p-4 lg:p-6  border border-default-500 w-full rounded-xl break-inside-avoid">
                         <img src={`http://localhost:5023${pinDetail?.imageUrl}`} className="rounded-lg" />
-                        <h1 className="text-4xl font-bold">{pinDetail?.title}</h1>
+                        <h1 className="text-xl sm:text-4xl font-bold">{pinDetail?.title}</h1>
                         <p>{pinDetail?.description}</p>
                         <div className="flex items-center justify-between mt-4">
                             <div className="flex items-center gap-2">
@@ -150,7 +151,9 @@ export default function Explorer()
                                 }
                                 <span className="text-3xl">{pinDetail?.likesCount}</span>
                             </div>
-                            <Button isDisabled color="primary" variant="shadow">Salvar</Button>
+                            <Button isIconOnly  isDisabled color="primary" variant="shadow">
+                                <FaBookmark />
+                            </Button>
                         </div>
                     </div>
                  : 

@@ -10,6 +10,7 @@ using CloudPins.Application.Pins.LikePin;
 using CloudPins.Application.Pins.UnlikePin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 
 namespace CloudPins.Api.Controllers;
 
@@ -21,6 +22,7 @@ public class PinsController : ControllerBase
     private readonly GetPinByIdQueryHandler _getByIdHandler;
     private readonly GetPinsFeedQueryHandler _feedHandler;
     private readonly GetFeedByPinQueryHandler _feedByPinHandler;
+    private readonly GetSearchFeedQueryHandler _getSearchHandler;
     private readonly LikePinCommandHandler _likePinHandler;
     private readonly UnlikePinCommandHandler _unlikePinHandler;
 
@@ -29,6 +31,7 @@ public class PinsController : ControllerBase
         GetPinByIdQueryHandler getByIdHandler,
         GetPinsFeedQueryHandler feedHandler,
         GetFeedByPinQueryHandler feedByPinHandler,
+        GetSearchFeedQueryHandler getSearchHandler,
         LikePinCommandHandler likePinHandler,
         UnlikePinCommandHandler unlikePinHandler
     )
@@ -37,6 +40,7 @@ public class PinsController : ControllerBase
         _getByIdHandler = getByIdHandler;
         _feedHandler = feedHandler;
         _feedByPinHandler = feedByPinHandler;
+        _getSearchHandler = getSearchHandler;
         _likePinHandler = likePinHandler;
         _unlikePinHandler = unlikePinHandler;
     }
@@ -105,6 +109,15 @@ public class PinsController : ControllerBase
             ct
         );
         return Ok(feedByPin);
+    }
+
+    [Authorize]
+    [HttpGet("/search/{search}")]
+    public async Task<IActionResult> Search(string search, CancellationToken ct)
+    {
+        var feedSearch = await _getSearchHandler.Handle(new SearchFeedQuery(search), ct);
+
+        return Ok(feedSearch);
     }
 
     [Authorize]

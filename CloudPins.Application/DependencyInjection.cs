@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<CreatePinCommandHandler>();
         services.AddScoped<GetPinByIdQueryHandler>();
         services.AddScoped<GetPinsFeedQueryHandler>();
+        services.AddScoped<GetSearchFeedQueryHandler>();
         services.AddScoped<GetFeedByPinQueryHandler>();
 
         // TAGS

@@ -99,6 +99,7 @@ export default function Profile()
 
     const handleSaveProfile = async () => {
         if(!profile) return;
+        if(!editedName) return;
 
         const formData = new FormData();
         formData.append("Name", editedName);

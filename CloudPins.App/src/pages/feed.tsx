@@ -1,7 +1,9 @@
 import ErrorMensage from "@/components/errorMensage";
 import DefaultLayout from "@/layouts/default";
 import { getFeed } from "@/services/pinsService";
+import { getTags } from "@/services/tagsService";
 import { Pin } from "@/types/pin";
+import { Tag } from "@/types/tag";
 import { Link } from "@heroui/link";
 import {Skeleton} from "@heroui/skeleton";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -10,6 +12,7 @@ export default function Feed()
 {
     const [feed, setFeed] = useState<Pin[]>([]);
     const [loading, setLoading] = useState(true);
+    const [tags, setTags] = useState<Tag[]>([]);
     const [error, setError] = useState("");
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -36,6 +39,14 @@ export default function Feed()
     );
 
     useEffect(() => {
+        async function loadTags()
+        {
+            const data = await getTags();
+            if(data)
+            {
+                setTags(data);
+            }
+        }
         async function loadFeed(){
             try {
                 setLoading(true);
@@ -57,6 +68,7 @@ export default function Feed()
         }
 
         loadFeed();
+        loadTags();
     }, [page]);
 
 
@@ -64,9 +76,9 @@ export default function Feed()
         <DefaultLayout>
             <ul className="w-full flex items-center justify-center gap-5">
                 <Link href="/feed" underline="always" color="foreground">Todos</Link>
-                <Link href="/feed" underline="hover" color="foreground">Anime</Link>
-                <Link href="/feed" underline="hover" color="foreground">Tecnologia</Link>
-                <Link href="/feed" underline="hover" color="foreground">UI/UX</Link>
+                {tags.map((tag) => (
+                    <Link href={`/search/${tag.name}`} color="foreground">{tag.name}</Link>
+                ))}
             </ul>
             {error && (
                 <ErrorMensage error={error}/>

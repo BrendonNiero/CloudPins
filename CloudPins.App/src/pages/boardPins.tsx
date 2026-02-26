@@ -35,6 +35,8 @@ export default function BoardPins()
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+    const [createPinError, setCreatePinError] = useState("");
+
     // MODAL CRIAR PIN
     const { isOpen, onOpen, onOpenChange} = useDisclosure();
 
@@ -91,6 +93,22 @@ export default function BoardPins()
     };
 
     async function handleSaveCreatePin(){
+        setCreatePinError("");
+
+        if(!selectedFile)
+        {
+            setCreatePinError("Selecione uma imagem para criar pin.");
+            return;
+        }
+        if(!pinTitle){
+            setCreatePinError("Adicione um título para o pin.");
+            return;
+        }
+        if(!pinDescription)
+        {
+            setCreatePinError("Adicione uma descrição para seu pin.");
+            return;
+        }
         const formData = new FormData();
         formData.append("Title", pinTitle);
         formData.append("Description", pinDescription);
@@ -102,8 +120,15 @@ export default function BoardPins()
         if(selectedFile)
             formData.append("Image", selectedFile);
 
-        await createPin(formData);
-        await loadPins();
+        try {
+            await createPin(formData);
+        }
+        catch(error: any){
+            setCreatePinError(error);
+        }
+        finally {
+            await loadPins();
+        }
 
         // LIMPANDO VARIÁVEIS DE CRIAÇÃO DE PIN
         setPreviewUrl(null);
@@ -112,6 +137,7 @@ export default function BoardPins()
         setPinDescription("");
         setTagsPin([]);
         onOpenChange();
+        setCreatePinError("");
     }
 
     function handleModalCreatePinClose()
@@ -121,6 +147,7 @@ export default function BoardPins()
         setTagsPin([]);
         setPinTitle("");
         setPinDescription("");
+        setCreatePinError("");
     }
 
     // TRABALHANDO COM TAGS
@@ -152,9 +179,9 @@ export default function BoardPins()
                     )) : 
                     pins.map((pin) => (
                         <Link key={pin.id} href={`/explorar/${pin.id}`}>
-                                <img src={`http://localhost:5023${pin.thumbnailUrl}`}
-                                    className="w-full rounded-lg break-inside-avoid"/>
-                            </Link>
+                            <img src={`http://localhost:5023${pin.thumbnailUrl}`}
+                                className="w-full rounded-lg break-inside-avoid"/>
+                        </Link>
                         ))
                     }
                 </section>
@@ -197,6 +224,7 @@ export default function BoardPins()
                                     </div>
                                     <Input placeholder="Título do Pin" value={pinTitle} onChange={(e) => setPinTitle(e.target.value)}/>
                                     <Textarea placeholder="Descrição" value={pinDescription} onChange={(e) => setPinDescription(e.target.value)}/>
+                                    {createPinError && <p className="text-red-500">{createPinError}</p>}
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button onPress={onClose}>Cancelar</Button>

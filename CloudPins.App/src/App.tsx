@@ -8,6 +8,7 @@ import Feed from "./pages/feed";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import Explorer from "./pages/explorer";
 import BoardPins from "./pages/boardPins";
+import FindPins from "./pages/findPins";
 
 function App() {
   return (
@@ -36,6 +37,11 @@ function App() {
           <BoardPins />
         </ProtectedRoute>
       } path="/board/:id"/>
+      <Route element={
+        <ProtectedRoute>
+          <FindPins />
+        </ProtectedRoute>
+      } path="/search/:search" />
     </Routes>
   );
 }

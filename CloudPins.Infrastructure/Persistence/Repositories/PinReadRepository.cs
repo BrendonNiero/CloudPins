@@ -2,6 +2,7 @@ using CloudPins.Application.Common.Interfaces;
 using CloudPins.Application.Pins.GetByBoard;
 using CloudPins.Application.Pins.GetById;
 using CloudPins.Application.Pins.GetFeed;
+using CloudPins.Domain.Pins;
 using Microsoft.EntityFrameworkCore;
 
 namespace CloudPins.Infrastructure.Persistence.Repositories;
@@ -41,6 +42,54 @@ public class PinReadRepository : IPinReadRepository
                 .Any(l => l.PinId == p.Id && l.UserId == currentUserId)
         })
         .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<List<PinFeedItemDto>> GetSearchFeed(
+        string search,
+        int page,
+        int pageSize,
+        CancellationToken ct
+    )
+    {
+        if(string.IsNullOrWhiteSpace(search))
+            return new List<PinFeedItemDto>();
+
+        var terms = search
+            .ToLower()
+            .Split('-', StringSplitOptions.RemoveEmptyEntries);
+
+        var publicBoardIds = _context.Boards
+            .AsNoTracking()
+            .Where(b => b.IsPublic && !b.IsDeleted)
+            .Select(b => b.Id);
+
+        var query = _context.Pins
+            .AsNoTracking()
+            .Where(p =>
+                !p.IsDeleted && publicBoardIds.Contains(p.BoardId))
+            .Select(p => new
+            {
+                Pin = p,
+                MatchCount = 
+                    terms.Count(t => p.Title.ToLower().Contains(t)) * 3 +
+                    terms.Count(t => p.Description.ToLower().Contains(t)) +
+                    terms.Count(t => p.PinTags.Any(pt =>
+                        _context.Tags.Any(tg => tg.Id == pt.TagId &&
+                            tg.Name.ToLower().Contains(t)))) * 2
+            })
+            .Where(x => x.MatchCount > 0)
+            .OrderByDescending(x => x.MatchCount)
+            .ThenByDescending(x => x.Pin.CreatedAt)
+            .Skip((page -1) * pageSize)
+            .Take(pageSize);
+
+        return await query
+            .Select(x => new PinFeedItemDto
+            {
+                Id = x.Pin.Id,
+                ThumbnailUrl = x.Pin.ThumbnailUrl
+            })
+            .ToListAsync(ct);
     }
 
     public async Task<List<PinFeedItemDto>> GetFeedAsync(
