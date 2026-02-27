@@ -17,6 +17,7 @@ import { FaCamera } from "react-icons/fa";
 import { Checkbox } from "@heroui/checkbox";
 import { cn } from "@heroui/theme";
 import { FaLock } from "react-icons/fa";
+import { useAuth } from "@/contexts/authContext";
 
 export default function Profile()
 {
@@ -27,6 +28,7 @@ export default function Profile()
     const [profile, setProfile] = useState<ProfileDetail>();
     const [loadingProfile, setLoadingProfile] = useState(true);
     const [errorProfile, setErrorProfile] = useState("");
+    const { updateUser } = useAuth();
 
     const [editedName, setEditedName] = useState("");
     // PARA SELECT IMAGE
@@ -106,7 +108,13 @@ export default function Profile()
         if(selectedFile)
             formData.append("Image", selectedFile);
 
-        await updateProfile(formData);
+        const updated = await updateProfile(formData);
+
+        updateUser({
+          name: updated.name,
+          profileUrl: updated.profileUrl,
+        });
+    
         await loadProfile();
 
         // LIMPA PREVIEW E SELECTEDFILE

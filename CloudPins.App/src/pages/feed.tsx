@@ -74,7 +74,7 @@ export default function Feed()
 
     return(
         <DefaultLayout>
-            <ul className="w-full flex items-center justify-center gap-5">
+            <ul className="w-full flex-wrap flex items-center justify-center gap-5">
                 <Link href="/feed" underline="always" color="foreground">Todos</Link>
                 {tags.map((tag) => (
                     <Link href={`/search/${tag.name}`} color="foreground">{tag.name}</Link>

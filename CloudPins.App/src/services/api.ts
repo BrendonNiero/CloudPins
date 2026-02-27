@@ -19,14 +19,17 @@ export async function apiFetch(
     });
 
     if(!response.ok){
+        if(response.status === 401)
+        {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+            return;
+        }
         let message = "Erro inesperado.";
         switch(response.status)
         {
             case 400:
                 message = "Requisição inválida";
-                break;
-            case 401:
-                message = "Acesso negado."
                 break;
             case 403:
                 message = "Acesso negado."

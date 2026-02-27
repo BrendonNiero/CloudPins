@@ -3,19 +3,13 @@ import { Form } from "@heroui/form";
 import { ThemeSwitch } from "./theme-switch";
 import { Link } from "@heroui/link";
 import { IoSearch } from "react-icons/io5";
-import { useEffect, useState } from "react";
-import { ProfileDetail } from "@/types/profileDetail";
-import { getProfile } from "@/services/profileService";
-import { Skeleton } from "@heroui/skeleton";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "@/contexts/authContext";
 
 export default function HeaderLogged()
 {
-    const [loading, setLoading] = useState(true);
-    const [profile, setProfile] = useState<ProfileDetail>();
-    const [error, setError] = useState(false);
-
+    const { user } = useAuth();
     const [search, setSearch] = useState("");
     const navigate = useNavigate();
 
@@ -29,26 +23,6 @@ export default function HeaderLogged()
         if(!search.trim()) return;
         navigate(`/search/${toSlug(search)}`);
     }
-
-    useEffect(() => {
-        async function loadProfile()
-        {
-            try {
-                setLoading(true);
-                const data = await getProfile();
-                setProfile(data);
-            }
-            catch
-            {
-                setError(true);
-            }
-            finally
-            {
-                setLoading(false);
-            }
-        }
-        loadProfile();
-    }, []);
     return(
         <div className="flex items-center justify-between gap-5">
             <Link href="/feed">
@@ -65,11 +39,9 @@ export default function HeaderLogged()
             <div className="flex items-center gap-5">
                 <ThemeSwitch />
                 {
-                    error ? <Skeleton className="h-12 w-12 rounded-full" /> :
-                    loading ? <Skeleton className="h-12 w-12 rounded-full" /> :
-                        <Link href="/profile">
-                        <img className="h-10 min-w-10 md:h-12 md:min-w-12 rounded-full" src={`http://localhost:5023${profile?.profileUrl}`} />
-                        </Link>
+                    <Link href="/profile">
+                        <img className="h-10 min-w-10 md:h-12 md:min-w-12 rounded-full" src={`http://localhost:5023${user?.profileUrl}`} />
+                    </Link>
                 }
             </div>
         </div>
