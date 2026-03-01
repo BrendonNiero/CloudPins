@@ -1,4 +1,6 @@
 import HeaderVisitant from "@/components/headerVisitant";
+import { useAuth } from "@/contexts/authContext";
+import { createProfile } from "@/services/authService";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
@@ -6,19 +8,23 @@ import { Input } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { useRef, useState } from "react";
 import { FaCamera } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 export default function Register()
 {
+    const { loginUser } = useAuth();
+    const navigate = useNavigate();
     // STEP 1
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [repeatPassword, setRepeatPassword] = useState("");
     const [firstStepError, setFirstStepError] = useState("");
-
+    
     // STEP 2
     const [step, setStep] = useState(1);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [profileName, setProfileName] = useState("");
+    const [secondStepError, setSecondStepError] = useState("");
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -50,9 +56,38 @@ export default function Register()
         setStep(2);
     }
 
-    function handleCreateUser()
+    async function handleCreateUser()
     {
+        setSecondStepError("");
+        if(!selectedFile)
+        {
+            setSecondStepError("Selecione uma foto de perfil.");
+            return;
+        }
+        if(!profileName)
+        {
+            setSecondStepError("Preencha seu nome de usuário.")
+        }
 
+        const formData = new FormData();
+
+        formData.append("Email", email);
+        formData.append("Password", password);
+        formData.append("Name", profileName);
+        formData.append("Image", selectedFile);
+
+        // salvar dentro de um localstorage 👇
+        try{
+
+            const createdUser = await createProfile(formData);
+            loginUser(createdUser);
+            navigate("/feed")
+        }
+        catch(error: any)
+        {
+            setSecondStepError(error.message);
+        }
+        
     }
 
     return(
@@ -66,10 +101,10 @@ export default function Register()
                         <h4 className="text-3xl">Criar uma nova conta</h4>
                         <p className="text-default-500 mb-5">Registre uma nova conta para ter acesso a todos os recursos.</p>
                         <div className="flex flex-col gap-3 w-full border-b border-b-default-500 pb-5">
-                            <Input label="Email"/>
-                            <Input label="Senha" type="password"/>
-                            <Input label="Repita sua senha" type="password"/>
-                            <Button color="primary" variant="shadow" onPress={handleSubmitFirstStep}>Entrar</Button>
+                            <Input label="Email" onChange={(e) => setEmail(e.target.value)}/>
+                            <Input label="Senha" type="password" onChange={(e) => setPassword(e.target.value)}/>
+                            <Input label="Repita sua senha" type="password" onChange={(e) => setRepeatPassword(e.target.value)}/>
+                            <Button color="primary" variant="shadow" onPress={handleSubmitFirstStep}>Criar Perfil</Button>
                             {firstStepError && <p className="text-red-500">{firstStepError}</p>}
                         </div>
                         <div className="w-full flex items-center gap-1 mt-5">
@@ -79,30 +114,37 @@ export default function Register()
                     </CardBody>
                 </Card>
                 :
-                <Card>
-                    <div className="w-full flex items-center justify-center mt-10 mb-5">
-                        <input onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if(file){ 
-                                setSelectedFile(file);
-                                const preview = URL.createObjectURL(file);
-                                setPreviewUrl(preview);
-                            }
-                        }}
-                        type="file" accept="image/*" ref={fileInputRef}
-                        className="hidden" />
-                        <div className="cursor-pointer hover:opacity-80 transition ease-in-out" onClick={handleClickSelectImage}>
-                            <Badge 
-                             placement="bottom-right" content={<div className="py-3 px-2"><FaCamera /></div>} size="lg">
-                                {previewUrl &&
-                                <img src={previewUrl} className="w-24 h-24 rounded-full"/>
+                <Card className="w-full md:max-w-[500px]">
+                    <CardBody className="p-10 text-center">
+                        <h2 className="text-2xl">Selecione uma foto de pefil</h2>
+                        <div className="w-full flex items-center justify-center mt-10 mb-5">
+                            <input onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if(file){ 
+                                    setSelectedFile(file);
+                                    const preview = URL.createObjectURL(file);
+                                    setPreviewUrl(preview);
                                 }
-                            </Badge>
+                            }}
+                            type="file" accept="image/*" ref={fileInputRef}
+                            className="hidden" />
+                            <div className="cursor-pointer hover:opacity-80 transition ease-in-out" onClick={handleClickSelectImage}>
+                                <Badge 
+                                 placement="bottom-right" content={<div className="py-3 px-2"><FaCamera /></div>} size="lg">
+                                    {previewUrl ?
+                                    <img src={previewUrl} className="w-24 h-24 rounded-full"/>
+                                    :
+                                    <Card className="w-24 h-24 rounded-full" />
+                                }
+                                </Badge>
+                            </div>
                         </div>
-                    </div>
-                    <Input value={profileName}
-                    onChange={(e) => setProfileName(e.target.value)}
-                    label="Nome de usuário" />
+                        <Input value={profileName}
+                        onChange={(e) => setProfileName(e.target.value)}
+                        label="Nome de usuário" />
+                        <Button onPress={handleCreateUser} className="mt-5" variant="shadow" color="primary">Finalizar Cadastro</Button>
+                        {secondStepError && <p className="text-red-500 mt-5">{secondStepError}</p>}
+                    </CardBody>
                 </Card>
                 }
             </section>

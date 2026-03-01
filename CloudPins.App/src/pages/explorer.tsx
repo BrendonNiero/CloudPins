@@ -12,6 +12,10 @@ import { Link } from "@heroui/link";
 import { likePin } from "@/services/likePinService";
 import { unlikePin } from "@/services/unlikePinService";
 import { FaBookmark } from "react-icons/fa";
+import { Board } from "@/types/board";
+import { getBoards } from "@/services/boardService";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+
 
 
 export default function Explorer()
@@ -19,6 +23,7 @@ export default function Explorer()
     const { id } = useParams<{ id: string }>();
 
     const [pinDetail, setPinDetail] = useState<PinDetail>();
+    const [boards, setBoards] = useState<Board[]>();
     const [feed, setFeed] = useState<Pin[]>([]);
     const [loadingDetail, setLoadingDetail] = useState(true);
     const [loadingFeed, setFeedLoading] = useState(true);
@@ -47,6 +52,18 @@ export default function Explorer()
         },
         [loadingFeed, hasMore]
     );
+
+    async function loadBoards()
+    {
+        try {
+            const data = await getBoards();
+            setBoards(data);
+        }
+        catch(error: any)
+        {
+
+        }
+    }
 
     async function loadPinDetail()
     {
@@ -97,6 +114,7 @@ export default function Explorer()
 
         loadPinDetail();
         loadExplorerFeed();
+        loadBoards();
     }, [id, page]);
 
     useEffect(() => {
@@ -151,9 +169,26 @@ export default function Explorer()
                                 }
                                 <span className="text-3xl">{pinDetail?.likesCount}</span>
                             </div>
-                            <Button isIconOnly  isDisabled color="primary" variant="shadow">
-                                <FaBookmark />
-                            </Button>
+
+                            <Dropdown>
+                                <DropdownTrigger>
+                                        <Button isIconOnly color="primary" variant="shadow">
+                                    <FaBookmark />
+                                </Button>
+                                </DropdownTrigger>
+                                <DropdownMenu items={boards} disabledKeys={"empty"}>
+                                    {boards ?
+                                    boards?.map((board) => (
+                                        <DropdownItem key={board.id}>
+                                            {board.name         }
+                                        </DropdownItem>
+                                    )):
+                                    <DropdownItem key="empty">
+                                        Você não possui board ainda.
+                                    </DropdownItem>}
+                                </DropdownMenu>
+                            </Dropdown>
+                            
                         </div>
                     </div>
                  : 

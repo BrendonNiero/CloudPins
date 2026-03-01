@@ -18,9 +18,14 @@ import { Checkbox } from "@heroui/checkbox";
 import { cn } from "@heroui/theme";
 import { FaLock } from "react-icons/fa";
 import { useAuth } from "@/contexts/authContext";
+import { FiLogOut } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Profile()
 {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
     const [boards, setBoards] = useState<Board[]>([]);
     const [loadingBoards, setLoadingBoard] = useState(true);
     const [errorBoards, setErrorBoards] = useState("");
@@ -173,6 +178,12 @@ export default function Profile()
         loadBoards();
     }
 
+    function handleLogout()
+    {
+        navigate("/login");
+        logout();
+    }
+
     return(
         <DefaultLayout>
             <div className="flex w-full items-center justify-between mb-5 flex-wrap gap-5">
@@ -187,6 +198,7 @@ export default function Profile()
                         name={profile?.name}
                         description="3 Boards"/>
                         <Button  onPress={handleModalProfileOpen} isIconOnly color="primary" variant="shadow"><FaPen /></Button>
+                        <Button onPress={handleLogout} startContent={<FiLogOut />} color="danger">Sair</Button>
                     </div>
                     }
             </div>

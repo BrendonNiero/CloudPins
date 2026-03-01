@@ -4,5 +4,6 @@ public record CreateUserResult(
     Guid Id,
     string Name,
     string Email,
-    string ProfileUrl
+    string ProfileUrl,
+    string token
 );

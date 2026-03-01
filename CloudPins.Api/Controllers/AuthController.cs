@@ -1,3 +1,4 @@
+using CloudPins.Api.Models.DTO;
 using CloudPins.Application.Users.Create;
 using CloudPins.Application.Users.Login;
 using Microsoft.AspNetCore.Mvc;
@@ -22,10 +23,23 @@ public class AuthController : ControllerBase
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(
-        [FromBody] CreateUserCommand command,
+        [FromForm] CreateProfileRequest request,
         CancellationToken ct
     )
     {
+        using var ms = new MemoryStream();
+        await request.Image.CopyToAsync(ms, ct);
+
+        var command = new CreateUserCommand
+        {
+            Email = request.Email,
+            Password = request.Password,
+            Name = request.Name,
+            ImageBytes = ms.ToArray(),
+            ImageFileName = request.Image.FileName,
+            ImageContentType = request.Image.ContentType
+        };
+
         var result = await _createHandler.Handle(command, ct);
         return Created("", result);
     }

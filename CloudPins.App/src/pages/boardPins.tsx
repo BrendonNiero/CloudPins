@@ -13,7 +13,6 @@ import { createPin } from "@/services/pinsService";
 import { Tag } from "@/types/tag";
 import { getTags } from "@/services/tagsService";
 import { Input, Textarea } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
 import { Card } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 

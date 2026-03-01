@@ -6,3 +6,8 @@ export async function login(email: string, password: string) {
         body: JSON.stringify({ email, password })
     });
 }
+
+export async function createProfile(formData: FormData)
+{
+    return apiFetch("/auth/register", { method: "POST", body: formData });
+}
