@@ -74,6 +74,7 @@ export default function Profile()
 
     async function loadBoards()
     {
+        setErrorBoards("");
         try {
             setLoadingBoard(true);
             const data: Board[] = await getBoards();
@@ -196,7 +197,7 @@ export default function Profile()
                     <div className="flex items-center gap-5">
                         <User avatarProps={{ src: `http://localhost:5023${profile?.profileUrl}?t=${Date.now()}`}}
                         name={profile?.name}
-                        description="3 Boards"/>
+                        description={`${boards.length} Boards`}/>
                         <Button  onPress={handleModalProfileOpen} isIconOnly color="primary" variant="shadow"><FaPen /></Button>
                         <Button onPress={handleLogout} startContent={<FiLogOut />} color="danger">Sair</Button>
                     </div>

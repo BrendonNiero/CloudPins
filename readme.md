@@ -1,5 +1,5 @@
 # CloudPins 📌☁
-![Banner CloudPins](./assets/banner-cloudpins.png)
+![Banner CloudPins](./assets/preview.gif)
 CloudPins é uma plataforma de curadoria visual que permite organizar, salvar e descobrir novas imagens por meio de coleções.
 
 A plataforma foi projetada com foco em escalabilidade, separação de responsabilidades e armazenamento eficiente de mídia, utilizando arquitetura limpa, domínio bem definido e um modelo de leitura otimizado para feeds.
@@ -13,6 +13,12 @@ O sistema permite que um usuário:
 - Veja um feed público de pins
 - Dê like em pins
 
+# 📲 Feed
+- Pins de Boards públicas
+- Ordem de Relevancia
+- Infinit Scroll
+
+
 ## 🍇 Comandos Migrations
 ### ➕ Criar um nova migration
 ```
@@ -22,9 +28,6 @@ dotnet ef migrations add NomeDaMigrationNova --project CloudPins.Infrastructure 
 ```
 dotnet ef database update --project CloudPins.Infrastructure --startup-project CloudPins.Api
 ```
-
-## Documentações importantes
-- [AWS-Sdks .NET](https://docs.localstack.cloud/aws/integrations/aws-sdks/net/#_top)
 
 ## 🎲 Tabelas do Banco
 
@@ -57,8 +60,3 @@ dotnet ef database update --project CloudPins.Infrastructure --startup-project C
 | UserId | PinId |
 |--------|-------|
 | Guid | Guid |
-
-# 📲 Feed
-- Pins públicos
-- Ordenados por CreatedAt
-

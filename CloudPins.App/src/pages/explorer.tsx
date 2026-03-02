@@ -55,14 +55,8 @@ export default function Explorer()
 
     async function loadBoards()
     {
-        try {
-            const data = await getBoards();
-            setBoards(data);
-        }
-        catch(error: any)
-        {
-
-        }
+        const data = await getBoards();
+        setBoards(data);
     }
 
     async function loadPinDetail()
