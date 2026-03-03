@@ -1,13 +1,48 @@
 services:
-  localstack:
-    image: localstack/localstack:latest
-    container_name: cloudpins-aws
-    ports: 
-      - "4566:4566"
+  postgres:
+    image: postgres:16
+    container_name: cloudpins_postgres
+    restart: always
     environment:
-      - SERVICES=s3
-      - AWS_ACCESS_KEY_ID=teste
-      - AWS_SECRET_ACCESS_KEY=teste
-      - AWS_DEFAULT_REGION=us-east-1
+      POSTGRES_DB: cloudpins
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
     volumes:
-      - localstack:/var/lib/localstack
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cloudpins"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: CloudPins.Api/Dockerfile
+    container_name: cloudpins_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "5023:8080"
+    volumes:
+      - uploads_data:/app/storage
+
+  frontend:
+    build:
+      context: ./CloudPins.App
+    container_name: cloudpins_frontend
+    depends_on:
+      - api
+    ports:
+      - "5173:5173"
+
+volumes:
+  postgres_data:
+  uploads_data:

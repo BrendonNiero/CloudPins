@@ -3,6 +3,7 @@ using CloudPins.Api.Common;
 using CloudPins.Api.Seed;
 using CloudPins.Application;
 using CloudPins.Infrastructure;
+using CloudPins.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -14,12 +15,12 @@ var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-    policy =>
-    {
-        policy.WithOrigins("http://localhost:5173")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -39,19 +40,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Controllers
 builder.Services.AddControllers();
-
-// Swagger | OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerWithJwt();
 
 builder.Services.AddApplication();
-
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+await app.Services.ApplyMigrationAsync();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -61,20 +60,23 @@ using (var scope = app.Services.CreateScope())
 var storageRoot = builder.Configuration["Storage:LocalRoot"];
 var bucket = builder.Configuration["Storage:BucketName"];
 
-var fullPath = Path.Combine(storageRoot!, bucket!);
+// pega a raiz física /app no docker
+var contentRoot = builder.Environment.ContentRootPath;
 
-if(!Directory.Exists(fullPath))
+var fullPath = Path.Combine(contentRoot, storageRoot!, bucket!);
+
+if (!Directory.Exists(fullPath))
 {
     Directory.CreateDirectory(fullPath);
 }
 
 app.UseStaticFiles(new StaticFileOptions
 {
-   FileProvider = new PhysicalFileProvider(fullPath),
-   RequestPath = "/uploads"
+    FileProvider = new PhysicalFileProvider(fullPath),
+    RequestPath = "/uploads"
 });
 
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

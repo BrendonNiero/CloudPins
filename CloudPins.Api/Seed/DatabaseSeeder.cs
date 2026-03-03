@@ -21,13 +21,34 @@ public static class DatabaseSeeder
         if(context.Users.Any()) return;
 
         // CRIAR USUÁRIO
-        var passwordHasher = passwordHahser.Hash("123");
+        var userName = "Brendon Berzins";
+        var passwordHash = passwordHahser.Hash("123");
+
+        var profileImagePath = Path.Combine(
+            AppContext.BaseDirectory,
+            "Seed",
+            "Images",
+            "user1.jpg"
+        );
+
+        string profileUrl = "";
+
+        if (File.Exists(profileImagePath))
+        {
+            var bytes = await File.ReadAllBytesAsync(profileImagePath);
+
+            profileUrl = await storage.UploadAsync(
+                bytes,
+                "image/jpeg",
+                CancellationToken.None
+            );
+        }
 
         var user = User.Create(
-            "Brendon Berzins",
-            "/uploads/profile/user1.jpg",
+            userName,
+            profileUrl,
             "admin@gmail.com",
-            passwordHasher
+            passwordHash
         );
 
         context.Users.Add(user);
@@ -45,11 +66,13 @@ public static class DatabaseSeeder
 
         // CRAIR TAGS
         var tagAnime = new Tag("anime");
+        var tagFood = new Tag("food");
+        var tagOutfit = new Tag("outfit");
         var tagGames = new Tag("games");
         var tagRoom = new Tag("room");
         var tagSetup = new Tag("setup");
 
-        context.Tags.AddRange(tagAnime, tagGames, tagRoom, tagSetup);
+        context.Tags.AddRange(tagAnime, tagGames, tagRoom, tagSetup, tagOutfit, tagFood);
         await context.SaveChangesAsync();
 
         // CRIAR PINS
