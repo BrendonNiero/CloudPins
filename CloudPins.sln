@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudPins.Application", "Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudPins.Infrastructure", "CloudPins.Infrastructure\CloudPins.Infrastructure.csproj", "{9251CA3B-4F78-400C-B84A-13928EB2C693}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudPins.Domain.Tests", "CloudPins.Domain.Tests\CloudPins.Domain.Tests.csproj", "{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{9251CA3B-4F78-400C-B84A-13928EB2C693}.Release|x64.Build.0 = Release|Any CPU
 		{9251CA3B-4F78-400C-B84A-13928EB2C693}.Release|x86.ActiveCfg = Release|Any CPU
 		{9251CA3B-4F78-400C-B84A-13928EB2C693}.Release|x86.Build.0 = Release|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Debug|x64.Build.0 = Debug|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Debug|x86.Build.0 = Debug|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Release|x64.ActiveCfg = Release|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Release|x64.Build.0 = Release|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Release|x86.ActiveCfg = Release|Any CPU
+		{6D9756C1-5EAB-4B5D-ABF5-83125E18834E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
