@@ -1,6 +1,6 @@
 using CloudPins.Domain.Users;
 
-namespace CloudPins.Domain.Testes.Users;
+namespace CloudPins.Domain.Tests.Users;
 
 public class UserTests
 {

@@ -26,7 +26,7 @@ public class Board : BaseEntity
         return board;
     }
 
-    public void Rename(string name, string description)
+    public void Rename(string name)
     {
         Name = name;
     }
