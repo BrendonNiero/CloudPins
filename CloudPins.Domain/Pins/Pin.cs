@@ -24,6 +24,21 @@ public class Pin : BaseEntity
         IEnumerable<Guid> tagIds
     )
     {
+        if(ownerId == Guid.Empty)
+            throw new ArgumentException("OwnerId is required");
+
+        if(boardId == Guid.Empty)
+            throw new ArgumentException("BoardId is required");
+
+        if(string.IsNullOrWhiteSpace(imageUrl))
+            throw new ArgumentException("ImageUrl is required");
+
+        if(string.IsNullOrWhiteSpace(thumbNailUrl))
+            throw new ArgumentException("ThumbnailUrl is required");
+
+        if(string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title is required");
+ 
         var pin = new Pin
         {
             Id = Guid.NewGuid(),
