@@ -14,6 +14,11 @@ public class Board : BaseEntity
         string name, 
         bool isPublic)
     {
+        if(ownerId == Guid.Empty)
+            throw new ArgumentException("OwnerId is required");
+
+        if(string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name is required");
         var board = new Board
         {            
             Id = Guid.NewGuid(),

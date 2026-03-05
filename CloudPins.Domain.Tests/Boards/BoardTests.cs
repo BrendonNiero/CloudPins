@@ -49,4 +49,18 @@ public class BoardTests
         // Assert
         Assert.Equal("Renamed Board", board.Name);
     }
+
+    [Fact]
+    public void Create_Should_Throw_When_Name_Is_Empty()
+    {
+        Assert.Throws<ArgumentException>( () => 
+            Board.Create(Guid.NewGuid(), "", true));
+    }
+
+    [Fact]
+    public void Create_Should_Throw_When_OwnerId_Is_Empty()
+    {
+        Assert.Throws<ArgumentException>( () =>
+            Board.Create(Guid.Empty, "My Board", true));
+    }
 }

@@ -8,6 +8,8 @@ public class Tag : BaseEntity
 
     public Tag(string name)
     {
+        if(string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name is required");
         Id = Guid.NewGuid();
         Name = name;
         CreatedAt = DateTime.UtcNow;
