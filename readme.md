@@ -56,7 +56,7 @@ O sistema permite que um usuário:
     <img width="12" />
     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dot-net/dot-net-plain-wordmark.svg" height="40" alt="dot-net logo"  />
     <img width="12" />
-      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/  amazonwebservices-plain-wordmark.svg" height="40"/>  
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" height="40"/>  
     <img width="12" />
 </div>
 
@@ -87,6 +87,10 @@ Operações de escrita incluem:
 
 ## Testabilidade
 O projeto foi estruturado para facilitar a criação de testes automatizados.
+
+# 💫 Próximas Features
+- Cache de feed com Redis
+- Content Moderation
 
 ## 🍇 Comandos Migrations
 ### ➕ Criar um nova migration
