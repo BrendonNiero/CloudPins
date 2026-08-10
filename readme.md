@@ -87,8 +87,12 @@ Operações de escrita incluem:
 
 ## Testabilidade
 O projeto foi estruturado para facilitar a criação de testes automatizados.
+```
+dotnet test CloudPins.Domain.Tests\CloudPins.Domain.Tests.csproj
+```
 
 # 💫 Próximas Features
+- Compartilhar pin
 - Cache de feed com Redis
 - Content Moderation
 
