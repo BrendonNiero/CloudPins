@@ -6,6 +6,7 @@ using CloudPins.Domain.Tags;
 using CloudPins.Domain.Users;
 using CloudPins.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.Internal;
 
 namespace CloudPins.Api.Seed;
 public static class DatabaseSeeder
@@ -76,6 +77,23 @@ public static class DatabaseSeeder
         await context.SaveChangesAsync();
 
         // CRIAR PINS
+
+        var seedPins = new List<SeedPin>
+        {
+            new(
+                "anime1.jpg",
+                "Purple anime icon Satoru Gojo",
+                "Satoru Gojo profile anime picture with background purple",
+                ["anime"]
+            ),
+            new(
+                "anime2.jpg",
+                "Qin Shi Huang profile picture icon",
+                "Record of Ragnarok profile picture anime",
+                ["anime"]
+            ),
+        };
+
         var imagesPath = Path.Combine(
             AppContext.BaseDirectory,
             "Seed",
@@ -127,4 +145,12 @@ public static class DatabaseSeeder
 
         await context.SaveChangesAsync();
     }
+
+    private sealed record SeedPin(
+        string FileName,
+        string Title,
+        string Description,
+        string[] Tags
+    );
 }
+
