@@ -18,6 +18,25 @@ services:
       retries: 5
       start_period: 10s
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: cloudpins_elasticsearch
+    restart: always
+    environment: 
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -XMx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   api:
     build:
       context: .
@@ -25,6 +44,8 @@ services:
     container_name: cloudpins_api
     depends_on:
       postgres:
+        condition: service_healthy
+      elasticsearch:
         condition: service_healthy
     environment:
       ASPNETCORE_URLS: http://+:8080
@@ -46,3 +67,4 @@ services:
 volumes:
   postgres_data:
   uploads_data:
+  elastic_search:
