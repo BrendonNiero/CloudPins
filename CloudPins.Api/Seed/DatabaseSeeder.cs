@@ -4,6 +4,7 @@ using CloudPins.Domain.Pins;
 using CloudPins.Domain.Tags;
 using CloudPins.Domain.Users;
 using CloudPins.Infrastructure.Persistence;
+using CloudPins.Infrastructure.Search;
 
 namespace CloudPins.Api.Seed;
 
@@ -12,6 +13,8 @@ public static class DatabaseSeeder
     public static async Task SeedAsync(IServiceProvider services)
     {
         using var scope = services.CreateScope();
+        var elasticsearchService =
+            scope.ServiceProvider.GetRequiredService<ElasticsearchService>();
         var context = scope.ServiceProvider.GetRequiredService<CloudPinsDbContext>();
         var storage = scope.ServiceProvider.GetRequiredService<IStorageService>();
         var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
@@ -36,18 +39,46 @@ public static class DatabaseSeeder
         context.Tags.AddRange(tags.Values);
         await context.SaveChangesAsync();
 
+        var createdPins = new List<(Pin Pin, string[] Tags)>();
+
         foreach (var seedPin in BuildSeedPins())
         {
             var imagePath = Path.Combine(imagesPath, seedPin.FileName);
+
             if (!File.Exists(imagePath))
                 continue;
 
             var imageUrl = await UploadImageAsync(imagePath, storage);
-            var tagIds = seedPin.Tags.Where(tags.ContainsKey).Select(tagName => tags[tagName].Id).ToArray();
-            context.Pins.Add(Pin.Create(user.Id, board.Id, imageUrl, imageUrl, seedPin.Title, seedPin.Description, tagIds));
+
+            var tagIds = seedPin.Tags
+                .Where(tags.ContainsKey)
+                .Select(tagName => tags[tagName].Id)
+                .ToArray();
+
+            var pin = Pin.Create(
+                user.Id,
+                board.Id,
+                imageUrl,
+                imageUrl,
+                seedPin.Title,
+                seedPin.Description,
+                tagIds);
+
+            context.Pins.Add(pin);
+            createdPins.Add((pin, seedPin.Tags));
         }
 
         await context.SaveChangesAsync();
+        foreach (var createdPin in createdPins)
+        {
+            var document = PinDocumentMapper.ToDocument(
+                createdPin.Pin,
+                createdPin.Tags);
+        
+            await elasticsearchService.IndexAsync(
+                createdPin.Pin.Id.ToString(),
+                document);
+        }
     }
 
     private static async Task<string> UploadImageAsync(string imagePath, IStorageService storage)

@@ -1,12 +1,15 @@
 using Amazon.S3;
+using Elastic.Clients.Elasticsearch;
 using CloudPins.Application.Common.Interfaces;
 using CloudPins.Infrastructure.Persistence;
 using CloudPins.Infrastructure.Persistence.Repositories;
+using CloudPins.Infrastructure.Search;
 using CloudPins.Infrastructure.Security;
 using CloudPins.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace CloudPins.Infrastructure;
 
@@ -25,6 +28,14 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(
             configuration.GetSection("Jwt")
         );
+
+        services.Configure<ElasticsearchOptions>(configuration.GetSection("Elasticsearch"));
+        services.AddSingleton<ElasticsearchClient>(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<ElasticsearchOptions>>().Value;
+            return new ElasticsearchClient(new ElasticsearchClientSettings(new Uri(options.Url)));
+        });
+        services.AddSingleton<ElasticsearchService>();
 
         services.Configure<StorageOptions>(
             configuration.GetSection("Storage")

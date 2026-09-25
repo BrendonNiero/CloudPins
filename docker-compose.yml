@@ -26,7 +26,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -XMx512m
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
       - "9200:9200"
     volumes:
@@ -67,4 +67,4 @@ services:
 volumes:
   postgres_data:
   uploads_data:
-  elastic_search:
+  elasticsearch_data:

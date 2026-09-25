@@ -4,6 +4,7 @@ using CloudPins.Api.Seed;
 using CloudPins.Application;
 using CloudPins.Infrastructure;
 using CloudPins.Infrastructure.Extensions;
+using CloudPins.Infrastructure.Search;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -49,6 +50,10 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+var elasticsearchService = app.Services.GetRequiredService<ElasticsearchService>();
+
+await elasticsearchService.EnsureIndexAsync();
 
 await app.Services.ApplyMigrationAsync();
 
