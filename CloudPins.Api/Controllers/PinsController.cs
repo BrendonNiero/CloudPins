@@ -1,5 +1,3 @@
-using Amazon.S3;
-using Amazon.S3.Model;
 using CloudPins.Api.Common;
 using CloudPins.Api.Models.DTO;
 using CloudPins.Application.Pins.Create;
@@ -8,6 +6,7 @@ using CloudPins.Application.Pins.GetById;
 using CloudPins.Application.Pins.GetFeed;
 using CloudPins.Application.Pins.LikePin;
 using CloudPins.Application.Pins.UnlikePin;
+using CloudPins.Infrastructure.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
@@ -25,6 +24,7 @@ public class PinsController : ControllerBase
     private readonly GetSearchFeedQueryHandler _getSearchHandler;
     private readonly LikePinCommandHandler _likePinHandler;
     private readonly UnlikePinCommandHandler _unlikePinHandler;
+    private readonly ElasticsearchService _elasticsearchService;
 
     public PinsController(
         CreatePinCommandHandler createHandler,
@@ -33,7 +33,8 @@ public class PinsController : ControllerBase
         GetFeedByPinQueryHandler feedByPinHandler,
         GetSearchFeedQueryHandler getSearchHandler,
         LikePinCommandHandler likePinHandler,
-        UnlikePinCommandHandler unlikePinHandler
+        UnlikePinCommandHandler unlikePinHandler,
+        ElasticsearchService elasticsearchService
     )
     {
         _createHandler = createHandler;
@@ -115,9 +116,16 @@ public class PinsController : ControllerBase
     [HttpGet("/search/{search}")]
     public async Task<IActionResult> Search(string search, CancellationToken ct)
     {
-        var feedSearch = await _getSearchHandler.Handle(new SearchFeedQuery(search), ct);
+        if(string.IsNullOrWhiteSpace(search))
+            return BadRequest("Search term is required.");
 
-        return Ok(feedSearch);
+        var results = await _elasticsearchService.SearchPinAsync(
+            search,
+            20,
+            ct
+        );
+
+        return Ok(results);
     }
 
     [Authorize]

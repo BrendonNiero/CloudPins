@@ -37,4 +37,36 @@ public sealed class ElasticsearchService
         if (!response.IsValidResponse)
             throw new InvalidOperationException($"Could not index document '{id}' in '{_options.IndexName}'.");
     }
+
+    public async Task<IReadOnlyCollection<PinDocument>> SearchPinAsync(
+        string searchTerm,
+        int size = 20,
+        CancellationToken ct = default
+    )
+    {
+        if(string.IsNullOrWhiteSpace(searchTerm))
+            return Array.Empty<PinDocument>();
+
+        size = Math.Clamp(size, 1, 100);
+
+        var response = await _client.SearchAsync<PinDocument>(
+            request => request
+                .Index(_options.IndexName)
+                .Size(size)
+                .Query(query => query
+                    .MultiMatch(multiMatch => multiMatch
+                        .Query(searchTerm)
+                        .Fields(new[]
+                        {
+                            "title",
+                            "description",
+                            "tags"
+                        }))),
+            ct);
+
+        if(!response.IsValidResponse)
+            throw new InvalidOperationException("Could not search pins in Elasticsearch");
+
+        return response.Documents;
+    }
 }
