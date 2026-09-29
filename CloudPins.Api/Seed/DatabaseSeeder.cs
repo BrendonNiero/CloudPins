@@ -34,7 +34,12 @@ public static class DatabaseSeeder
         var board = Board.Create(user.Id, "Seed Boards Admin", true);
         context.Boards.Add(board);
 
-        var tagNames = new[] { "anime", "car", "games", "room", "setup", "food", "outfit", "woman", "aesthetic", "gaming", "home-office", "interior-design" };
+        var tagNames = new[]
+        {
+            "anime", "car", "games", "room", "setup", "food", "sport", "outfit", "woman",
+            "aesthetic", "gaming", "home-office", "interior-design", "formula-1", "red-bull",
+            "motorcycle", "ski", "jet-ski", "breakfast", "ramen"
+        };
         var tags = tagNames.ToDictionary(name => name, name => new Tag(name));
         context.Tags.AddRange(tags.Values);
         await context.SaveChangesAsync();
@@ -102,7 +107,7 @@ public static class DatabaseSeeder
     {
         var manualPins = new[]
         {
-            new SeedPin("anime1.jpg", "Purple anime icon Satoru Gojo", "Satoru Gojo profile anime picture with background purple", ["anime"]),
+            new SeedPin("anime1.jpg", "Purple anime icon Satoru Gojo", "Satoru Gojo Jujutsu Kaisen profile anime picture with background purple", ["anime"]),
             new SeedPin("anime2.jpg", "Qin Shi Huang profile picture icon", "Record of Ragnarok profile picture anime", ["anime"]),
             new SeedPin("anime3.jpg", "Purple anime profile picture", "Purple anime profile picture.", ["anime"]),
             new SeedPin("anime4.jpg", "Girl Colors AI anime profile picture.", "Color AI girl profile picture", ["anime"]),
@@ -132,6 +137,21 @@ public static class DatabaseSeeder
             new SeedPin("games8.jpg", "Joel Millerthe last of us 1", "Aesthetic profile picture of Joel Miller from The last of US.", ["games"]),
             new SeedPin("games9.jpg", "Malenia, Blade of Miquella", "Elden Ring. Malenia, aesthetic profile picture.", ["games"]),
             new SeedPin("games10.jpg", "Ashley Graham Resident Evil 4 Remake", "Aesthetic profile picture of Ashley Graham smiling from Resident Evil 4 Remake looking foward.", ["games"]),
+            new SeedPin("games11.jpg", "Maelle Clair Obscur Expedition 33", "Aesthetic portrait of Maelle from Clair Obscur: Expedition 33, featuring a dramatic fantasy atmosphere and elegant character design.", ["games"]),
+            new SeedPin("games12.jpg", "Sciel Clair Obscur Expedition 33", "Aesthetic portrait of Sciel from Clair Obscur: Expedition 33, with a mysterious visual style and detailed fantasy character design.", ["games"]),
+            new SeedPin("games13.jpg", "Lune Clair Obscur Expedition 33", "Aesthetic portrait of Lune from Clair Obscur: Expedition 33, combining magical elements, expressive colors and a cinematic mood.", ["games"]),
+            new SeedPin("games14.jpg", "GTA 6 OLED TV Aesthetic", "Grand Theft Auto VI displayed on an OLED television, creating a cinematic gaming setup with rich colors and a modern aesthetic.", ["games", "gaming", "aesthetic"]),
+            new SeedPin("games15.jpg", "GTA 6 PS5 OLED Gaming Setup", "Aesthetic PlayStation 5 gaming setup showing Grand Theft Auto VI on an OLED TV, with immersive lighting and a clean entertainment space.", ["games", "gaming", "aesthetic"]),
+            new SeedPin("food1.jpg", "Ramen Anime Aesthetic", "A warm bowl of ramen presented with anime-inspired details, creating a cozy Japanese food and aesthetic scene.", ["food", "ramen", "anime", "aesthetic"]),
+            new SeedPin("food2.jpg", "Fresh Fruit Salad Aesthetic", "Colorful fresh fruit salad arranged in an aesthetic composition, ideal for a light, healthy and refreshing meal.", ["food", "aesthetic"]),
+            new SeedPin("food3.jpg", "Open-Faced Sandwiches and Iced Tea", "Light breakfast or lunch setup with two open-faced sandwiches and a refreshing glass of iced tea.", ["food", "breakfast"]),
+            new SeedPin("food4.jpg", "Caprese Sandwiches and Coffee", "Two open-faced caprese sandwiches served with a cup of milky coffee in a cozy aesthetic breakfast setup.", ["food", "breakfast"]),
+            new SeedPin("food5.jpg", "Folded Crepe with Black Coffee", "Golden-brown folded crepe or thin omelet served with a hot cup of black coffee topped with a light foam layer.", ["food", "breakfast"]),
+            new SeedPin("sport1.jpg", "Red Bull Formula 1 Racing Woman", "Woman wearing a Red Bull shirt at a Formula 1 racetrack, capturing the energy and atmosphere of motorsport.", ["sport", "formula-1", "red-bull", "woman"]),
+            new SeedPin("sport2.jpg", "Red Bull Motorcycle Trail in the Sky", "Red Bull motorcycle rider performing an impressive trail stunt high in the sky, creating an energetic action sports scene.", ["sport", "red-bull", "motorcycle"]),
+            new SeedPin("sport3.jpg", "Red Motorcycle Trail Aesthetic", "Aesthetic action photograph of a red motorcycle rider performing a trail stunt with a woman watching the scene.", ["sport", "motorcycle", "woman", "aesthetic"]),
+            new SeedPin("sport4.jpg", "Skiing in a Snowy Landscape", "Aesthetic winter sports photograph of a man skiing through a snowy mountain landscape surrounded by soft white scenery.", ["sport", "ski", "aesthetic"]),
+            new SeedPin("sport5.jpg", "Jet Ski Adventure in the Ocean", "Aesthetic jet ski scene on the open ocean, capturing movement, blue water and the freedom of water sports.", ["sport", "jet-ski", "aesthetic"]),
             new SeedPin("room1.jpg", "Dreamy Whimsigoth Bedroom Inspo ✨💜", "Creating the ultimate cozy sanctuary with purple LED lighting, vinyl record wall decor, and hanging vines. Perfect aesthetic room inspiration for anyone loving dark, moody, and comfortable room layouts. Save this for your next bedroom makeover! 🕸️🐈‍⬛", ["room"]),
             new SeedPin("room2.jpg", "Architectural & Spatial Layout", "elevated wooden platform to isolate the sleeping quarters from the main lounge area.", ["room"]),
             new SeedPin("room4.jpg", "Dark Aesthetic Kitchen with Purple LED Lights 💜✨", "Giving major cozy, modern vibes with this gorgeous kitchen setup. Love how the matte black cabinets and white marble countertops pop under the purple ambient LED under-cabinet lighting. Perfect kitchen inspiration for a moody, high-contrast interior design. Save this pin for your next home remodel! 🍇💻", ["room"])

@@ -44,6 +44,7 @@ public class PinsController : ControllerBase
         _getSearchHandler = getSearchHandler;
         _likePinHandler = likePinHandler;
         _unlikePinHandler = unlikePinHandler;
+        _elasticsearchService = elasticsearchService;
     }
 
     [Authorize]
@@ -114,14 +115,18 @@ public class PinsController : ControllerBase
 
     [Authorize]
     [HttpGet("/search/{search}")]
-    public async Task<IActionResult> Search(string search, CancellationToken ct)
+    public async Task<IActionResult> Search(string search, 
+        [FromQuery] int  page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct= default)
     {
         if(string.IsNullOrWhiteSpace(search))
-            return BadRequest("Search term is required.");
+            return BadRequest("Search  term is required.");
 
-        var results = await _elasticsearchService.SearchPinAsync(
+        var results = await _elasticsearchService.SearchPinsAsync(
             search,
-            20,
+            page,
+            pageSize,
             ct
         );
 
