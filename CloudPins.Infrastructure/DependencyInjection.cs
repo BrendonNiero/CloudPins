@@ -37,6 +37,11 @@ public static class DependencyInjection
         });
         services.AddSingleton<ElasticsearchService>();
 
+        services.AddSingleton<IPinSearchService>(
+            serviceProvider =>
+                serviceProvider.GetRequiredService<ElasticsearchService>()
+        );
+
         services.Configure<StorageOptions>(
             configuration.GetSection("Storage")
         );

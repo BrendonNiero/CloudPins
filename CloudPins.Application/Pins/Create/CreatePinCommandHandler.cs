@@ -9,18 +9,24 @@ public class CreatePinCommandHandler
     private readonly IPinRepository _pinRepository;
     private readonly IBoardRepository _boardRepository;
     private readonly IStorageService _storage;
+    private readonly ITagRepository _tagRepository;
+    private readonly IPinSearchService _pinSearchService;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreatePinCommandHandler(
         IPinRepository pinRepository,
         IBoardRepository boardRepository,
         IStorageService storage,
+        ITagRepository tagRepository,
+        IPinSearchService pinSearchService,
         IUnitOfWork unitOfWork
     )
     {
         _pinRepository = pinRepository;
         _boardRepository = boardRepository;
         _storage = storage;
+        _tagRepository = tagRepository;
+        _pinSearchService = pinSearchService;
         _unitOfWork = unitOfWork;
     }
 
@@ -30,6 +36,8 @@ public class CreatePinCommandHandler
         CancellationToken ct
     )
     {
+        var tagIds = command.TagIds ?? new List<Guid>();
+
         var boardExists = await _boardRepository.ExistsAsync(command.BoardId, ct);
         if (!boardExists)
             throw new NotFoundException("Board not found.");
@@ -48,11 +56,17 @@ public class CreatePinCommandHandler
             thumbNailUrl: imageUrl,
             title: command.Title,
             description: command.Description,
-            tagIds: command.TagIds ?? Enumerable.Empty<Guid>()
+            tagIds: tagIds
         );
 
         await _pinRepository.AddAsync(pin, ct);
         await _unitOfWork.SaveChangesAsync(ct);
+
+
+        var tagNames = await _tagRepository.GetNamesByIdsAsync(tagIds, ct);
+
+        await _pinSearchService.IndexAsync(pin, tagNames, ct);
+
 
         return new CreatePinResult
         {

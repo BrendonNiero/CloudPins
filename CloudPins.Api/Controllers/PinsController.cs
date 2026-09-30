@@ -123,7 +123,7 @@ public class PinsController : ControllerBase
         if(string.IsNullOrWhiteSpace(search))
             return BadRequest("Search  term is required.");
 
-        var results = await _elasticsearchService.SearchPinsAsync(
+        var results = await _elasticsearchService.SearchAsync(
             search,
             page,
             pageSize,

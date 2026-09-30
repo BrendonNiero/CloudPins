@@ -5,4 +5,8 @@ namespace CloudPins.Application.Common.Interfaces;
 public interface ITagRepository
 {
     Task AddAsync(Tag tag, CancellationToken ct);
+
+    Task<IReadOnlyCollection<string>> GetNamesByIdsAsync(
+        IEnumerable<Guid> tagIds,
+        CancellationToken ct);
 }

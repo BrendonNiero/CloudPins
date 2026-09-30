@@ -76,13 +76,9 @@ public static class DatabaseSeeder
         await context.SaveChangesAsync();
         foreach (var createdPin in createdPins)
         {
-            var document = PinDocumentMapper.ToDocument(
+            await elasticsearchService.IndexAsync(
                 createdPin.Pin,
                 createdPin.Tags);
-        
-            await elasticsearchService.IndexAsync(
-                createdPin.Pin.Id.ToString(),
-                document);
         }
     }
 

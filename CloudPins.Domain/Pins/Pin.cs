@@ -71,4 +71,9 @@ public class Pin : BaseEntity
         if(_pinTags.Any(pt => pt.TagId == tagId)) return;
         _pinTags.Add(new PinTag(Id, tagId));
     }
+
+    public void UpdateDetails()
+    {
+        
+    }
 }
