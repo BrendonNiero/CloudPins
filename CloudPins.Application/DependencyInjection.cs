@@ -2,10 +2,12 @@ using CloudPins.Application.Boards.Create;
 using CloudPins.Application.Boards.GetAll;
 using CloudPins.Application.Boards.GetById;
 using CloudPins.Application.Pins.Create;
+using CloudPins.Application.Pins.Delete;
 using CloudPins.Application.Pins.GetById;
 using CloudPins.Application.Pins.GetFeed;
 using CloudPins.Application.Pins.LikePin;
 using CloudPins.Application.Pins.UnlikePin;
+using CloudPins.Application.Pins.Update;
 using CloudPins.Application.Tags.Create;
 using CloudPins.Application.Tags.GetAll;
 using CloudPins.Application.Users.Create;
@@ -32,6 +34,8 @@ public static class DependencyInjection
         services.AddScoped<GetPinsFeedQueryHandler>();
         services.AddScoped<GetSearchFeedQueryHandler>();
         services.AddScoped<GetFeedByPinQueryHandler>();
+        services.AddScoped<UpdatePinCommandHandler>();
+        services.AddScoped<DeletePinCommandHandler>();
 
         // TAGS
         services.AddScoped<CreateTagCommandHandler>();

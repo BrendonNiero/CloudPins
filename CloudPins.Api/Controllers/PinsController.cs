@@ -1,11 +1,13 @@
 using CloudPins.Api.Common;
 using CloudPins.Api.Models.DTO;
 using CloudPins.Application.Pins.Create;
+using CloudPins.Application.Pins.Delete;
 using CloudPins.Application.Pins.GetAll;
 using CloudPins.Application.Pins.GetById;
 using CloudPins.Application.Pins.GetFeed;
 using CloudPins.Application.Pins.LikePin;
 using CloudPins.Application.Pins.UnlikePin;
+using CloudPins.Application.Pins.Update;
 using CloudPins.Infrastructure.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +25,8 @@ public class PinsController : ControllerBase
     private readonly GetFeedByPinQueryHandler _feedByPinHandler;
     private readonly GetSearchFeedQueryHandler _getSearchHandler;
     private readonly LikePinCommandHandler _likePinHandler;
+    private readonly UpdatePinCommandHandler _updatePinHandler;
+    private readonly DeletePinCommandHandler _deletePinHandler;
     private readonly UnlikePinCommandHandler _unlikePinHandler;
     private readonly ElasticsearchService _elasticsearchService;
 
@@ -33,6 +37,8 @@ public class PinsController : ControllerBase
         GetFeedByPinQueryHandler feedByPinHandler,
         GetSearchFeedQueryHandler getSearchHandler,
         LikePinCommandHandler likePinHandler,
+        UpdatePinCommandHandler updatePinHandler,
+        DeletePinCommandHandler deletePinCommand,
         UnlikePinCommandHandler unlikePinHandler,
         ElasticsearchService elasticsearchService
     )
@@ -43,6 +49,8 @@ public class PinsController : ControllerBase
         _feedByPinHandler = feedByPinHandler;
         _getSearchHandler = getSearchHandler;
         _likePinHandler = likePinHandler;
+        _updatePinHandler = updatePinHandler;
+        _deletePinHandler = deletePinCommand;
         _unlikePinHandler = unlikePinHandler;
         _elasticsearchService = elasticsearchService;
     }
@@ -152,6 +160,46 @@ public class PinsController : ControllerBase
 
         await _unlikePinHandler.Handle(id, currentUserId, ct);
 
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> Update(
+        Guid id,
+        [FromBody] UpdatePinRequest request,
+        CancellationToken ct
+    )
+    {
+        var currentUserId = HttpContext.GetUserId();
+
+        var command = new UpdatePinCommand
+        {
+            PinId = id,
+            Title = request.Title,
+            Description = request.Description,
+            TagIds = request.TagIds ?? []
+        };
+
+        await _updatePinHandler.Handle(
+            command, currentUserId, ct
+        );
+
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(
+        Guid id, CancellationToken ct
+    )
+    {
+        var currentUserId = HttpContext.GetUserId();
+
+        var command = new DeletePinCommand(id);
+
+        await _deletePinHandler.Handle(command, currentUserId, ct);
+        
         return NoContent();
     }
 }

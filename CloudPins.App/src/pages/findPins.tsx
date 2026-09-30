@@ -21,11 +21,12 @@ export default function FindPins()
             try
             {
                 const data = await getSearchFeed(search!);
-                if(!data || data.length == 0)
+                const items = data?.items ?? [];
+                if(items.length === 0)
                 {
                     setError("Não encontramos nenhum pin relacionado.");
                 }
-                setPins(data)
+                setPins(items)
             }
             catch(error: any)
             {

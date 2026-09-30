@@ -72,8 +72,23 @@ public class Pin : BaseEntity
         _pinTags.Add(new PinTag(Id, tagId));
     }
 
-    public void UpdateDetails()
+    public void UpdateDetails(
+        string title,
+        string description,
+        List<Guid> tagIds
+    )
     {
-        
+        if(string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title is required.");
+
+        Title = title;
+        Description = description;
+
+        _pinTags.Clear();
+
+        foreach(var tagId in tagIds.Distinct())
+        {
+            AddTag(tagId);
+        }
     }
 }

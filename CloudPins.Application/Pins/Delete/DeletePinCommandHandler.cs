@@ -1,30 +1,27 @@
 using CloudPins.Application.Common.Exceptions;
 using CloudPins.Application.Common.Interfaces;
 
-namespace CloudPins.Application.Pins.Update;
+namespace CloudPins.Application.Pins.Delete;
 
-public sealed class UpdatePinCommandHandler
+public sealed class DeletePinCommandHandler
 {
     private readonly IPinRepository _pinRepository;
-    private readonly ITagRepository _tagRepository;
     private readonly IPinSearchService _pinSearchService;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UpdatePinCommandHandler(
+    public DeletePinCommandHandler(
         IPinRepository pinRepository,
-        ITagRepository tagRepository,
         IPinSearchService pinSearchService,
         IUnitOfWork unitOfWork
     )
     {
         _pinRepository = pinRepository;
-        _tagRepository = tagRepository;
         _pinSearchService = pinSearchService;
         _unitOfWork = unitOfWork;
     }
 
     public async Task Handle(
-        UpdatePinCommand command,
+        DeletePinCommand command,
         Guid currentUserId,
         CancellationToken ct
     )
@@ -35,20 +32,12 @@ public sealed class UpdatePinCommandHandler
             throw new NotFoundException("Pin not found.");
 
         if(pin.OwnerId != currentUserId)
-            throw new ForbiddenException("You cannot update this pin.");
+            throw new ForbiddenException("You cannot delete this pin.");
 
-        var tagIds = command.TagIds ??[];
-
-        pin.UpdateDetails(
-            command.Title,
-            command.Description,
-            tagIds
-        );
+        pin.SoftDelete();
 
         await _unitOfWork.SaveChangesAsync(ct);
 
-        var tagNames = await _tagRepository.GetNamesByIdsAsync(tagIds, ct);
-
-        await _pinSearchService.UpdateAsync(pin, tagNames, ct);
+        await _pinSearchService.DeleteAsync(pin.Id, ct);
     }
 }
