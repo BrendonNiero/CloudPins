@@ -60,6 +60,15 @@ await app.Services.ApplyMigrationAsync();
 using (var scope = app.Services.CreateScope())
 {
     await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
+
+    var reindexer = scope.ServiceProvider.GetRequiredService<PinReindexer>();
+
+    var indexedPins = await reindexer.ReindexAsync();
+
+    app.Logger.LogInformation(
+        "Reindexed {Count} pins in Elasticsearch",
+        indexedPins
+    );
 }
 
 var storageRoot = builder.Configuration["Storage:LocalRoot"];

@@ -84,6 +84,7 @@ public static class DependencyInjection
         services.AddScoped<IBoardReadRepository, BoardReadRepository>();
         services.AddScoped<IUserReadRepository, UserReadRepository>();
         services.AddScoped<ITagReadRepository, TagReadRepository>();
+        services.AddScoped<PinReindexer>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
