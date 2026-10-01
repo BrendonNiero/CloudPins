@@ -123,22 +123,44 @@ public class PinsController : ControllerBase
 
     [Authorize]
     [HttpGet("/search/{search}")]
-    public async Task<IActionResult> Search(string search, 
-        [FromQuery] int  page = 1,
+    public async Task<IActionResult> Search(
+        string search,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
-        CancellationToken ct= default)
+        CancellationToken ct = default)
     {
-        if(string.IsNullOrWhiteSpace(search))
-            return BadRequest("Search  term is required.");
+        if (string.IsNullOrWhiteSpace(search))
+            return BadRequest("Search term is required.");
 
-        var results = await _elasticsearchService.SearchAsync(
-            search,
-            page,
-            pageSize,
-            ct
-        );
+        try
+        {
+            var elasticResult = await _elasticsearchService.SearchAsync(
+                search,
+                page,
+                pageSize,
+                ct);
 
-        return Ok(results);
+            return Ok(elasticResult);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(
+                $"Elasticsearch unavailable. Using PostgreSQL fallback. {exception.Message}");
+
+            var postgresResult = await _getSearchHandler.Handle(
+                new SearchFeedQuery(search, page, pageSize),
+                ct);
+
+            return Ok(new
+            {
+                items = postgresResult,
+                page,
+                pageSize,
+                total = postgresResult.Count,
+                totalPages = postgresResult.Count == 0 ? 0 : 1,
+                source = "postgresql-fallback"
+            });
+        }
     }
 
     [Authorize]

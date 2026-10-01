@@ -141,7 +141,20 @@ public sealed class ElasticsearchService : IPinSearchService
 
         var createResponse = await _client.Indices.CreateAsync(
             _options.IndexName,
-            cancellationToken: cancellationToken);
+            descriptor => descriptor
+                .Mappings(mapping => mapping
+                    .Properties<PinDocument>(properties => properties
+                        .Keyword(field => field.Id)
+                        .Keyword(field => field.OwnerId)
+                        .Keyword(field => field.BoardId)
+                        .Text(field => field.Title)
+                        .Text(field => field.Description)
+                        .Text(field => field.Tags)
+                        .Keyword(field => field.ImageUrl)
+                        .Keyword(field => field.ThumbnailUrl)
+                        .IntegerNumber(field => field.LikesCount)
+                        .Date(field => field.CreatedAt))),
+            cancellationToken);
 
         if (!createResponse.IsValidResponse)
         {
