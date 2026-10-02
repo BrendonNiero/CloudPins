@@ -186,7 +186,7 @@ public class PinsController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost]
+    [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
         Guid id,
         [FromBody] UpdatePinRequest request,
