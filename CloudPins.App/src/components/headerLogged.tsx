@@ -66,14 +66,13 @@ export default function HeaderLogged()
                 className="w-full md:max-w-[600px] lg:max-w-[800px]" />
 
                 {suggestions.length > 0 && (
-                    <div className="absolute top-full z-50 mt-2 w-full max-w-[800px] overflow-hidden rounded-lg bg-content1 shadow-lg">
+                    <div className="absolute cursor-pointer top-full z-50 mt-2 w-full max-w-[800px] overflow-hidden rounded-lg bg-content1 shadow-lg">
                         {suggestions.map((suggestion) => (
                             <button
                                 key={suggestion}
                                 type="button"
                                 onClick={() => handleSuggestionClick(suggestion)}
-                                className="block w-full px-4 py-3 text-left hover:bg-content2"
-                            >
+                                className="block w-full px-4 py-3 text-left hover:bg-content2">
                                 {suggestion}
                             </button>
                         ))}

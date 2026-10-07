@@ -121,12 +121,18 @@ export default function BoardPins()
 
         try {
             await createPin(formData);
+            await loadPins();
+
+            setPreviewUrl(null);
+            setSelectedFile(null);
+            setPinTitle("");
+            setPinDescription("");
+            setTagsPin([]);
+            onOpenChange(false);
         }
         catch(error: any){
-            setCreatePinError(error);
-        }
-        finally {
-            await loadPins();
+            setCreatePinError(error?.message ?? "Nao foi possivel criar o pin.");
+            return;
         }
 
         // LIMPANDO VARIÁVEIS DE CRIAÇÃO DE PIN
@@ -135,8 +141,7 @@ export default function BoardPins()
         setPinTitle("");
         setPinDescription("");
         setTagsPin([]);
-        onOpenChange();
-        setCreatePinError("");
+        return;
     }
 
     function handleModalCreatePinClose()

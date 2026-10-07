@@ -18,6 +18,8 @@ export default function FindPins()
         async function loadPins()
         {
             setLoading(true);
+            setError("");
+
             try
             {
                 const data = await getSearchFeed(search!);
@@ -39,7 +41,7 @@ export default function FindPins()
         }
 
     loadPins();
-    }, []);
+    }, [search]);
     return(
         <DefaultLayout>
             {error && <ErrorMensage error={error} />}

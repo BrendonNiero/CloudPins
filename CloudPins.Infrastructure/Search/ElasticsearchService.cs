@@ -20,38 +20,27 @@ public sealed class ElasticsearchService : IPinSearchService
     }
 
     public async Task<IReadOnlyCollection<string>> AutocompleteAsync(
-        string searchTerm,
-        int size = 8,
-        CancellationToken cancellationToken = default)
+    string searchTerm,
+    int size = 8,
+    CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
             return Array.Empty<string>();
     
         size = Math.Clamp(size, 1, 20);
     
-        var response = await _client.SearchAsync<PinDocument>(
+        var normalizedSearchTerm = searchTerm
+            .Trim()
+            .ToLowerInvariant();
+    
+        var response = await _client.SearchAsync<SuggestionDocument>(
             request => request
-                .Index(_options.IndexName)
-                .Size(size)
+                .Index("cloudpins_suggestions")
+                .Size(size * 3)
                 .Query(query => query
-                    .Bool(boolean => boolean
-                        .Should(
-                            should => should
-                                .Match(match => match
-                                    .Field(new Field("title"))
-                                    .Query(searchTerm)),
-                
-                            should => should
-                                .Match(match => match
-                                    .Field(new Field("description"))
-                                    .Query(searchTerm)),
-                
-                            should => should
-                                .Match(match => match
-                                    .Field(new Field("tags"))
-                                    .Query(searchTerm))
-                        )
-                        .MinimumShouldMatch(1))),
+                    .Prefix(prefix => prefix
+                        .Field(new Field("normalizedText"))
+                        .Value(normalizedSearchTerm))),
             cancellationToken);
     
         if (!response.IsValidResponse)
@@ -60,17 +49,15 @@ public sealed class ElasticsearchService : IPinSearchService
                 "Could not retrieve autocomplete suggestions.");
         }
     
-        var suggestions = response.Documents
-            .SelectMany(document =>
-                new[] { document.Title }
-                    .Concat(document.Tags))
-            .Where(value =>
-                !string.IsNullOrWhiteSpace(value))
+        return response.Documents
+            .Where(document =>
+                !string.IsNullOrWhiteSpace(document.Text))
+            .OrderByDescending(document => document.Frequency)
+            .ThenByDescending(document => document.LastSeenAt)
+            .Select(document => document.Text)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Take(size)
             .ToArray();
-    
-        return suggestions;
     }
 
     public async Task<PinSearchResult> SearchAsync(

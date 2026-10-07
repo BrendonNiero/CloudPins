@@ -85,6 +85,9 @@ public static class DependencyInjection
         services.AddScoped<IUserReadRepository, UserReadRepository>();
         services.AddScoped<ITagReadRepository, TagReadRepository>();
         services.AddScoped<PinReindexer>();
+        services.AddScoped<SuggestionReindexer>();
+        services.AddScoped<ISuggestionService>(serviceProvider =>
+            serviceProvider.GetRequiredService<SuggestionReindexer>());
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

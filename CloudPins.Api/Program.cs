@@ -61,14 +61,23 @@ using (var scope = app.Services.CreateScope())
 {
     await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
 
-    var reindexer = scope.ServiceProvider.GetRequiredService<PinReindexer>();
+    var reindexer = scope.ServiceProvider
+        .GetRequiredService<PinReindexer>();
 
     var indexedPins = await reindexer.ReindexAsync();
 
     app.Logger.LogInformation(
-        "Reindexed {Count} pins in Elasticsearch",
-        indexedPins
-    );
+        "Reindexed {Count} pins in Elasticsearch.",
+        indexedPins);
+
+    var suggestionReindexer = scope.ServiceProvider
+        .GetRequiredService<SuggestionReindexer>();
+
+    var indexedSuggestions = await suggestionReindexer.ReindexAsync();
+
+    app.Logger.LogInformation(
+        "Reindexed {Count} autocomplete suggestions.",
+        indexedSuggestions);
 }
 
 var storageRoot = builder.Configuration["Storage:LocalRoot"];

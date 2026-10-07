@@ -64,7 +64,8 @@ export default function Profile()
         }
         catch(error: any)
         {
-            setErrorProfile(error);
+            setErrorProfile(
+                error?.message ?? "NÃ£o foi possÃ­vel carregar o perfil.");
         }
         finally
         {
@@ -189,10 +190,10 @@ export default function Profile()
         <DefaultLayout>
             <div className="flex w-full items-center justify-between mb-5 flex-wrap gap-5">
                 <h1 className="text-4xl font-bold">Suas Boards</h1>
-                    { errorProfile 
-                    ? <Skeleton className="w-48 h-12 rounded-xl"/> :
-                    loadingProfile 
+                    { loadingProfile 
                     ? <Skeleton className="w-48 h-12 rounded-xl"/>
+                    : errorProfile
+                    ? <p className="text-danger">{errorProfile}</p>
                     : 
                     <div className="flex items-center gap-5">
                         <User avatarProps={{ src: `http://localhost:5023${profile?.profileUrl}?t=${Date.now()}`}}

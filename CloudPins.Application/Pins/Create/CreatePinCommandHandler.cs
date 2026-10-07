@@ -11,6 +11,7 @@ public class CreatePinCommandHandler
     private readonly IStorageService _storage;
     private readonly ITagRepository _tagRepository;
     private readonly IPinSearchService _pinSearchService;
+    private readonly ISuggestionService _suggestionService;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreatePinCommandHandler(
@@ -19,6 +20,7 @@ public class CreatePinCommandHandler
         IStorageService storage,
         ITagRepository tagRepository,
         IPinSearchService pinSearchService,
+        ISuggestionService suggestionService,
         IUnitOfWork unitOfWork
     )
     {
@@ -27,6 +29,7 @@ public class CreatePinCommandHandler
         _storage = storage;
         _tagRepository = tagRepository;
         _pinSearchService = pinSearchService;
+        _suggestionService = suggestionService;
         _unitOfWork = unitOfWork;
     }
 
@@ -66,6 +69,13 @@ public class CreatePinCommandHandler
         var tagNames = await _tagRepository.GetNamesByIdsAsync(tagIds, ct);
 
         await _pinSearchService.IndexAsync(pin, tagNames, ct);
+        try
+        {
+            await _suggestionService.ReindexAsync(ct);
+        }
+        catch (Exception)
+        {
+        }
 
 
         return new CreatePinResult
