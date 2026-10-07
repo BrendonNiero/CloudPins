@@ -5,6 +5,11 @@ namespace CloudPins.Application.Common.Interfaces;
 
 public interface IPinSearchService
 {
+    Task<IReadOnlyCollection<string>> AutocompleteAsync(
+        string searchTerm,
+        int size = 8,
+        CancellationToken ct = default
+    );
     Task<PinSearchResult> SearchAsync(
         string searchTerm,
         int page = 1,

@@ -19,6 +19,60 @@ public sealed class ElasticsearchService : IPinSearchService
         _options = options.Value;
     }
 
+    public async Task<IReadOnlyCollection<string>> AutocompleteAsync(
+        string searchTerm,
+        int size = 8,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return Array.Empty<string>();
+    
+        size = Math.Clamp(size, 1, 20);
+    
+        var response = await _client.SearchAsync<PinDocument>(
+            request => request
+                .Index(_options.IndexName)
+                .Size(size)
+                .Query(query => query
+                    .Bool(boolean => boolean
+                        .Should(
+                            should => should
+                                .Match(match => match
+                                    .Field(new Field("title"))
+                                    .Query(searchTerm)),
+                
+                            should => should
+                                .Match(match => match
+                                    .Field(new Field("description"))
+                                    .Query(searchTerm)),
+                
+                            should => should
+                                .Match(match => match
+                                    .Field(new Field("tags"))
+                                    .Query(searchTerm))
+                        )
+                        .MinimumShouldMatch(1))),
+            cancellationToken);
+    
+        if (!response.IsValidResponse)
+        {
+            throw new InvalidOperationException(
+                "Could not retrieve autocomplete suggestions.");
+        }
+    
+        var suggestions = response.Documents
+            .SelectMany(document =>
+                new[] { document.Title }
+                    .Concat(document.Tags))
+            .Where(value =>
+                !string.IsNullOrWhiteSpace(value))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(size)
+            .ToArray();
+    
+        return suggestions;
+    }
+
     public async Task<PinSearchResult> SearchAsync(
         string searchTerm,
         int page = 1,
@@ -132,34 +186,15 @@ public sealed class ElasticsearchService : IPinSearchService
     public async Task EnsureIndexAsync(
         CancellationToken cancellationToken = default)
     {
-        var existsResponse = await _client.Indices.ExistsAsync(
+        var response = await _client.Indices.ExistsAsync(
             _options.IndexName,
-            cancellationToken);
+            cancellationToken
+        );
 
-        if (existsResponse.Exists)
-            return;
-
-        var createResponse = await _client.Indices.CreateAsync(
-            _options.IndexName,
-            descriptor => descriptor
-                .Mappings(mapping => mapping
-                    .Properties<PinDocument>(properties => properties
-                        .Keyword(field => field.Id)
-                        .Keyword(field => field.OwnerId)
-                        .Keyword(field => field.BoardId)
-                        .Text(field => field.Title)
-                        .Text(field => field.Description)
-                        .Text(field => field.Tags)
-                        .Keyword(field => field.ImageUrl)
-                        .Keyword(field => field.ThumbnailUrl)
-                        .IntegerNumber(field => field.LikesCount)
-                        .Date(field => field.CreatedAt))),
-            cancellationToken);
-
-        if (!createResponse.IsValidResponse)
+        if (!response.Exists)
         {
             throw new InvalidOperationException(
-                $"Could not create index '{_options.IndexName}'.");
+                $"Elasticsearch index '{_options.IndexName}' was not initialized.");
         }
     }
 }

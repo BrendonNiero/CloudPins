@@ -1,4 +1,3 @@
-using CloudPins.Domain.Pins;
 using CloudPins.Domain.Tests.Builders;
 
 namespace CloudPins.Domain.Tests.Pins;

@@ -164,6 +164,31 @@ public class PinsController : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("/search/autocomplete")]
+    public async Task<IActionResult> AutoComplete(
+        [FromQuery] string query,
+        CancellationToken ct
+    )
+    {
+        if(string.IsNullOrWhiteSpace(query))
+            return Ok(Array.Empty<string>());
+
+        try
+        {
+            var suggestions = await _elasticsearchService
+                .AutocompleteAsync(query, 8, ct);
+
+            return Ok(suggestions);
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Autocomplete unavaiable: {ex.Message}");
+
+            return Ok(Array.Empty<string>());
+        }
+    }
+
+    [Authorize]
     [HttpPost("{id:guid}/like")]
     public async Task<IActionResult> LikePin(Guid id, CancellationToken ct)
     {
