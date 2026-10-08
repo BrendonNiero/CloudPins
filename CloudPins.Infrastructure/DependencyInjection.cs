@@ -88,6 +88,11 @@ public static class DependencyInjection
         services.AddScoped<SuggestionReindexer>();
         services.AddScoped<ISuggestionService>(serviceProvider =>
             serviceProvider.GetRequiredService<SuggestionReindexer>());
+        services.AddSingleton<SuggestionReindexQueue>();
+        services.AddSingleton<ISuggestionReindexQueue>(serviceProvider =>
+            serviceProvider.GetRequiredService<SuggestionReindexQueue>());
+        services.AddHostedService(serviceProvider =>
+            serviceProvider.GetRequiredService<SuggestionReindexQueue>());
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

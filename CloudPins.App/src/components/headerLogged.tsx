@@ -3,7 +3,7 @@ import { Form } from "@heroui/form";
 import { ThemeSwitch } from "./theme-switch";
 import { Link } from "@heroui/link";
 import { IoSearch } from "react-icons/io5";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/authContext";
 import { getSearchSuggestions } from "@/services/pinsService";
@@ -13,7 +13,24 @@ export default function HeaderLogged()
     const { user } = useAuth();
     const [search, setSearch] = useState("");
     const [suggestions, setSuggestions] = useState<string[]>([]);
+    const suggestionsRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        function handlePointerDown(event: PointerEvent) {
+            const target = event.target as Node;
+
+            if (!suggestionsRef.current?.contains(target)) {
+                setSuggestions([]);
+            }
+        }
+
+        document.addEventListener("pointerdown", handlePointerDown);
+
+        return () => {
+            document.removeEventListener("pointerdown", handlePointerDown);
+        };
+    }, []);
 
     useEffect(() => {
         if (search.trim().length < 2) {
@@ -66,7 +83,7 @@ export default function HeaderLogged()
                 className="w-full md:max-w-[600px] lg:max-w-[800px]" />
 
                 {suggestions.length > 0 && (
-                    <div className="absolute cursor-pointer top-full z-50 mt-2 w-full max-w-[800px] overflow-hidden rounded-lg bg-content1 shadow-lg">
+                    <div ref={suggestionsRef} className="absolute cursor-pointer top-full z-50 mt-2 w-full max-w-[800px] overflow-hidden rounded-lg bg-content1 shadow-lg">
                         {suggestions.map((suggestion) => (
                             <button
                                 key={suggestion}

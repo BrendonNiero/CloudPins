@@ -8,21 +8,21 @@ public sealed class UpdatePinCommandHandler
     private readonly IPinRepository _pinRepository;
     private readonly ITagRepository _tagRepository;
     private readonly IPinSearchService _pinSearchService;
-    private readonly ISuggestionService _suggestionService;
+    private readonly ISuggestionReindexQueue _suggestionReindexQueue;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdatePinCommandHandler(
         IPinRepository pinRepository,
         ITagRepository tagRepository,
         IPinSearchService pinSearchService,
-        ISuggestionService suggestionService,
+        ISuggestionReindexQueue suggestionReindexQueue,
         IUnitOfWork unitOfWork
     )
     {
         _pinRepository = pinRepository;
         _tagRepository = tagRepository;
         _pinSearchService = pinSearchService;
-        _suggestionService = suggestionService;
+        _suggestionReindexQueue = suggestionReindexQueue;
         _unitOfWork = unitOfWork;
     }
 
@@ -53,12 +53,6 @@ public sealed class UpdatePinCommandHandler
         var tagNames = await _tagRepository.GetNamesByIdsAsync(tagIds, ct);
 
         await _pinSearchService.UpdateAsync(pin, tagNames, ct);
-        try
-        {
-            await _suggestionService.ReindexAsync(ct);
-        }
-        catch (Exception)
-        {
-        }
+        _suggestionReindexQueue.Enqueue();
     }
 }
