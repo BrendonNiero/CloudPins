@@ -20,7 +20,6 @@ export default function BoardPins()
 {
     const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState(false);
-    const [loadingTags, setLoadingTags] = useState(false);
     const [pins, setPins] = useState<Pin[]>([]);
     const [tags, setTags] = useState<Tag[]>();
     const [error, setError] = useState("");
@@ -37,7 +36,7 @@ export default function BoardPins()
     const [createPinError, setCreatePinError] = useState("");
 
     // MODAL CRIAR PIN
-    const { isOpen, onOpen, onOpenChange} = useDisclosure();
+    const { isOpen, onOpen, onClose, onOpenChange} = useDisclosure();
 
     async function loadPins()
     {
@@ -64,7 +63,6 @@ export default function BoardPins()
     {
         try
         {
-            setLoadingTags(true);
             const data: Tag[] = await getTags();
             setTags(data);
         }
@@ -74,7 +72,6 @@ export default function BoardPins()
         }
         finally
         {
-            setLoadingTags(false);
         }
     }
 
@@ -128,7 +125,7 @@ export default function BoardPins()
             setPinTitle("");
             setPinDescription("");
             setTagsPin([]);
-            onOpenChange(false);
+            onClose();
         }
         catch(error: any){
             setCreatePinError(error?.message ?? "Nao foi possivel criar o pin.");
@@ -174,7 +171,7 @@ export default function BoardPins()
             { error &&  <ErrorMensage error={error}/>}
             {!error &&
             <>
-                <Button onPress={onOpenChange}
+                <Button onPress={onOpen}
                     startContent={<FaPlus />} variant="shadow" color="primary">Criar novo Pin</Button>
                 <section className="columns-2 sm:col-end-3 md:columns-3 lg:columns-5 gap-3 space-y-3 mt-5">
                     { loading ?

@@ -15,6 +15,7 @@ import { FaBookmark } from "react-icons/fa";
 import { Board } from "@/types/board";
 import { getBoards } from "@/services/boardService";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import ErrorMensage from "@/components/errorMensage";
 
 
 
@@ -71,7 +72,7 @@ export default function Explorer()
         }
         catch(error: any)
         {
-            setError(error);
+            setError(error?.message ?? "Erro ao carregar detalhes do Pin.");
         }
         finally
         {
@@ -89,7 +90,7 @@ export default function Explorer()
                     return;
                 }
                 const data = await getFeedExplorer(id, page, 20);
-                if(data.lenght === 0)
+                if(data.length === 0)
                 {
                     setHasMore(false);
                 }
@@ -98,7 +99,7 @@ export default function Explorer()
             }
             catch(error: any)
             {
-                setFeedError(error);
+                setFeedError(error?.message ?? "Não foi possível carregar o feed.");
             }
             finally
             {
@@ -108,7 +109,9 @@ export default function Explorer()
 
         loadPinDetail();
         loadExplorerFeed();
-        loadBoards();
+        loadBoards().catch(() => {
+            setFeedError("Não foi possível carregar seus boards.");
+        });
     }, [id, page]);
 
     useEffect(() => {
@@ -144,6 +147,10 @@ export default function Explorer()
 
     return(
         <DefaultLayout>
+            {
+                 error ? (
+                    <ErrorMensage error={feedError}/>
+                ) :
             <section className="columns-2 sm:col-end-3 md:columns-4 gap-3 space-y-3">
                 {!loadingDetail ?
                     <div className="p-3 sm:p-4 lg:p-6  border border-default-500 w-full rounded-xl break-inside-avoid">
@@ -202,11 +209,12 @@ export default function Explorer()
                         </Link>
                     ))}
                 </section>
-                { hasMore && !error && (
-                    <div ref={lastElementRef} className="flex justify-center my-10">
-                        {loadingFeed && <Skeleton className="h-10 w-40 rounded-lg" />}
-                    </div>
-                )}
+            }      
+            { hasMore && !error && (
+                <div ref={lastElementRef} className="flex justify-center my-10">
+                    {loadingFeed && <Skeleton className="h-10 w-40 rounded-lg" />}
+                </div>
+            )}
         </DefaultLayout>
     );
 }
