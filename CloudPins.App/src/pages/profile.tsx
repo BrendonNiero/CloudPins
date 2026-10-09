@@ -182,7 +182,7 @@ export default function Profile()
 
     function handleLogout()
     {
-        navigate("/login");
+        navigate("/");
         logout();
     }
 

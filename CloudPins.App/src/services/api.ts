@@ -22,7 +22,7 @@ export async function apiFetch(
         if(response.status === 401)
         {
             localStorage.removeItem("token");
-            window.location.href = "/login";
+            window.location.href = "/";
             return;
         }
         let message = "Erro inesperado.";

@@ -9,14 +9,6 @@ export const siteConfig = {
       href: "/",
     },
     {
-      label: "Cadastre-se",
-      href: "/register"
-    },
-    {
-      label: "Entrar",
-      href: "/login"
-    },
-    {
       label: "Pin",
       href: "/pin/[id]"
     },
@@ -33,10 +25,6 @@ export const siteConfig = {
     {
       label: "Inicio",
       href: "/",
-    },
-    {
-      label: "Cadastre-se",
-      href: "/register"
     },
     {
       label: "Pin",
