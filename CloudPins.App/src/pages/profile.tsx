@@ -20,6 +20,7 @@ import { FaLock } from "react-icons/fa";
 import { useAuth } from "@/contexts/authContext";
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import ProfileImageCropper from "@/components/profileImageCropper";
 
 
 export default function Profile()
@@ -40,6 +41,7 @@ export default function Profile()
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [imageToCrop, setImageToCrop] = useState<File | null>(null);
 
     // MODAL PROFILE
     const { isOpen: isProfileOpen, onOpen: onProfileOpen, 
@@ -248,11 +250,8 @@ export default function Profile()
                                 <div className="w-full flex items-center justify-center mt-10 mb-5">
                                     <input onChange={(e) => {
                                         const file = e.target.files?.[0];
-                                        if(file){ 
-                                            setSelectedFile(file);
-                                            const preview = URL.createObjectURL(file);
-                                            setPreviewUrl(preview);
-                                        }
+                                        if(file) setImageToCrop(file);
+                                        e.target.value = "";
                                     }}
                                     type="file" accept="image/*" ref={fileInputRef}
                                     className="hidden" />
@@ -278,6 +277,12 @@ export default function Profile()
                     )}
                 </ModalContent>
             </Modal>
+            <ProfileImageCropper file={imageToCrop} isOpen={Boolean(imageToCrop)} onClose={() => setImageToCrop(null)} onComplete={(file, url) => {
+                if(previewUrl) URL.revokeObjectURL(previewUrl);
+                setSelectedFile(file);
+                setPreviewUrl(url);
+                setImageToCrop(null);
+            }} />
             <Modal backdrop="blur" isOpen={isBoardOpen} placement="bottom-center" onClose={handleModalBoardClose} onOpenChange={onBoardOpenChange}>
                 <ModalContent>
                     {(onClose) => (

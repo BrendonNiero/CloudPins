@@ -3,7 +3,8 @@ import { createProfile, login } from "@/services/authService";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import { useRef, useState } from "react";
+import ProfileImageCropper from "@/components/profileImageCropper";
+import { useEffect, useRef, useState } from "react";
 import { FaArrowLeft, FaCamera } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
@@ -20,8 +21,15 @@ export default function IndexPage() {
   const [profileName, setProfileName] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageToCrop, setImageToCrop] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   function changeView(nextView: View) {
     setError("");
@@ -91,7 +99,7 @@ export default function IndexPage() {
             <p className="mt-3 text-sm leading-6 text-slate-500">{isProfile ? "Escolha uma foto e um nome para aparecer nas suas boards." : isRegister ? "Organize suas inspirações em um só lugar." : "Continue organizando tudo o que inspira você."}</p>
             <div className="mt-7 flex flex-col gap-4">
               {isProfile ? <>
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; if (previewUrl) URL.revokeObjectURL(previewUrl); setSelectedFile(file); setPreviewUrl(URL.createObjectURL(file)); }} />
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) setImageToCrop(file); event.target.value = ""; }} />
                 <button type="button" className="mx-auto rounded-full" onClick={() => fileInputRef.current?.click()}>
                   <Badge placement="bottom-right" content={<span className="p-1"><FaCamera /></span>} color="primary" size="lg">{previewUrl ? <img src={previewUrl} alt="Prévia do perfil" className="h-24 w-24 rounded-full object-cover cursor-pointer" /> : <div className="h-24 w-24 rounded-full bg-[#dceeff] cursor-pointer" />}</Badge>
                 </button>
@@ -116,6 +124,7 @@ export default function IndexPage() {
           <div className="absolute inset-x-8 bottom-8 rounded-2xl border border-white/25 bg-white/15 p-6 text-white backdrop-blur-md"><p className="text-xl font-semibold leading-snug">“Suas ideias merecem um lugar para crescer.”</p><p className="mt-3 text-sm text-blue-100">Salve referências, crie boards e encontre inspiração todos os dias.</p></div>
         </aside>
       </section>
+      <ProfileImageCropper file={imageToCrop} isOpen={Boolean(imageToCrop)} onClose={() => setImageToCrop(null)} onComplete={(file, url) => { if (previewUrl) URL.revokeObjectURL(previewUrl); setSelectedFile(file); setPreviewUrl(url); setImageToCrop(null); }} />
     </main>
   );
 }
