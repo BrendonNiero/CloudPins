@@ -15,6 +15,7 @@ import { getTags } from "@/services/tagsService";
 import { Input, Textarea } from "@heroui/input";
 import { Card } from "@heroui/card";
 import { Chip } from "@heroui/chip";
+import { IoSearch } from "react-icons/io5";
 
 export default function BoardPins()
 {
@@ -171,8 +172,14 @@ export default function BoardPins()
             { error &&  <ErrorMensage error={error}/>}
             {!error &&
             <>
-                <Button onPress={onOpen}
-                    startContent={<FaPlus />} variant="shadow" color="primary">Criar novo Pin</Button>
+                <div className="w-full flex items-center justify-between">
+                    <Input 
+                            placeholder="Encontrar Pin" 
+                            startContent={<IoSearch />} 
+                            className="w-full md:max-w-[200px] lg:max-w-[400px]" />
+                    <Button onPress={onOpen}
+                        startContent={<FaPlus />} variant="shadow" color="primary">Criar novo Pin</Button>
+                </div>
                 <section className="columns-2 sm:col-end-3 md:columns-3 lg:columns-5 gap-3 space-y-3 mt-5">
                     { loading ?
                     Array.from({ length: 20}).map((_, i) => (

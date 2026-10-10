@@ -4,6 +4,7 @@ import { getProfile, updateProfile } from "@/services/profileService";
 import { Board } from "@/types/board";
 import { ProfileDetail } from "@/types/profileDetail";
 import { Button } from "@heroui/button";
+import {Select, SelectItem} from "@heroui/select";
 import { Card } from "@heroui/card";
 import { Link } from "@heroui/link";
 import { Skeleton } from "@heroui/skeleton";
@@ -21,6 +22,7 @@ import { useAuth } from "@/contexts/authContext";
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import ProfileImageCropper from "@/components/profileImageCropper";
+import { IoSearch } from "react-icons/io5";
 
 
 export default function Profile()
@@ -28,6 +30,8 @@ export default function Profile()
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [boards, setBoards] = useState<Board[]>([]);
+    const [boardSearch, setBoardSearch] = useState("");
+    const [boardVisibility, setBoardVisibility] = useState("all");
     const [loadingBoards, setLoadingBoard] = useState(true);
     const [errorBoards, setErrorBoards] = useState("");
 
@@ -55,6 +59,19 @@ export default function Profile()
     const [isBoardPrivate, setIsBoardPrivate] = useState(false);
     const [boardName, setBoardName] = useState("");
     const [boardError, setBoardError] = useState("");
+
+    const filteredBoards = boards.filter((board) => {
+        const matchesName = board.name
+            .toLowerCase()
+            .includes(boardSearch.trim().toLowerCase());
+
+        const matchesVisibility =
+            boardVisibility === "all" ||
+            (boardVisibility === "public" && board.isPublic) ||
+            (boardVisibility === "private" && !board.isPublic);
+
+        return matchesName && matchesVisibility;
+    });
 
     async function loadProfile()
     {
@@ -207,14 +224,38 @@ export default function Profile()
                     }
             </div>
             <section>
-                <Button color="primary" variant="shadow" onPress={handleModalBoardOpen}>Nova Board</Button>
+                <div className="w-full flex items-center justify-between">
+                    <div className="flex gap-3 items-center flex-wrap md:flex-row">
+                        <Input 
+                            placeholder="Encontrar Board" 
+                            startContent={<IoSearch />} 
+                            value={boardSearch}
+                            onValueChange={setBoardSearch}
+                            className="w-full md:max-w-[200px] lg:max-w-[400px]" />
+                        <Select
+                            aria-label="Filtrar boards por visibilidade"
+                            placeholder="Visibilidade"
+                            selectedKeys={new Set([boardVisibility])}
+                            onSelectionChange={(keys) => {
+                                const selectedKey = Array.from(keys)[0];
+                                setBoardVisibility(String(selectedKey ?? "all"));
+                            }}
+                            className="w-full md:w-40">
+                            <SelectItem key="all">Todos</SelectItem>
+                            <SelectItem key="public">Públicas</SelectItem>
+                            <SelectItem key="private">Privadas</SelectItem>
+                        </Select>
+                    </div>
+
+                    <Button color="primary" variant="shadow" onPress={handleModalBoardOpen}>Nova Board</Button>
+                </div>
                 <div className="flex items-center flex-wrap gap-5 mt-5">
                     {errorBoards && <h1>{errorBoards}</h1>}
                     {loadingBoards ?
                         Array.from({ length: 3}).map((_, i) => (
                             <Skeleton key={i} className="p-32 rounded-md"></Skeleton>
                         ))
-                        : boards.map((board) => (
+                        : filteredBoards.map((board) => (
                             <div key={board.id}>
                                 <Link href={`/board/${board.id}`}>
                                     <Card className="p-3 rounded-2xl overflow-hidden">

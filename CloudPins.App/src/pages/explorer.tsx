@@ -32,6 +32,8 @@ export default function Explorer()
     const [feedError, setFeedError] = useState("");
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [likePending, setLikePending] = useState(false);
+    const [likeAnimating, setLikeAnimating] = useState(false);
 
     const observer = useRef<IntersectionObserver | null>(null);
 
@@ -123,24 +125,65 @@ export default function Explorer()
 
     async function HandleLikePin()
     {
-        if(pinDetail?.isLiked) return;
+        if(pinDetail?.isLiked || likePending) return;
 
         if(pinDetail != null && id != null)
         {
-            
-            await likePin(id);
-            loadPinDetail();
+            const previousState = pinDetail;
+
+            setLikePending(true);
+            setLikeAnimating(true);
+            setPinDetail({
+                ...pinDetail,
+                isLiked: true,
+                likesCount: pinDetail.likesCount + 1
+            });
+
+            try
+            {
+                await likePin(id);
+            }
+            catch
+            {
+                setPinDetail(previousState);
+            }
+            finally
+            {
+                setLikePending(false);
+                window.setTimeout(() => setLikeAnimating(false), 250);
+            }
         }
     }
 
     async function HandleUnlikePin()
     {
-        if(!pinDetail?.isLiked) return;
+        if(!pinDetail?.isLiked || likePending) return;
 
         if(pinDetail != null && id != null)
         {
-            await unlikePin(id);
-            loadPinDetail();
+            const previousState = pinDetail;
+
+            setLikePending(true);
+            setLikeAnimating(true);
+            setPinDetail({
+                ...pinDetail,
+                isLiked: false,
+                likesCount: Math.max(0, pinDetail.likesCount - 1)
+            });
+
+            try
+            {
+                await unlikePin(id);
+            }
+            catch
+            {
+                setPinDetail(previousState);
+            }
+            finally
+            {
+                setLikePending(false);
+                window.setTimeout(() => setLikeAnimating(false), 250);
+            }
         }
     }
 
@@ -148,8 +191,8 @@ export default function Explorer()
     return(
         <DefaultLayout>
             {
-                 error ? (
-                    <ErrorMensage error={feedError}/>
+                 error || feedError ? (
+                    <ErrorMensage error={error || feedError}/>
                 ) :
             <section className="columns-2 sm:col-end-3 md:columns-4 gap-3 space-y-3">
                 {!loadingDetail ?
@@ -160,15 +203,17 @@ export default function Explorer()
                         <div className="flex items-center justify-between mt-4">
                             <div className="flex items-center gap-2">
                                 {pinDetail?.isLiked ? 
-                                    <Button isIconOnly color="danger" onPress={HandleUnlikePin}>
-                                        <FaHeart />
+                                    <Button isIconOnly color="danger" onPress={HandleUnlikePin} isDisabled={likePending}>
+                                        <FaHeart className={likeAnimating ? "scale-125 transition-transform duration-200" : "transition-transform duration-200"} />
                                     </Button> 
                                     : 
-                                    <Button isIconOnly onPress={HandleLikePin}>
-                                        <FaHeart />
+                                    <Button isIconOnly onPress={HandleLikePin} isDisabled={likePending}>
+                                        <FaHeart className={likeAnimating ? "scale-125 transition-transform duration-200" : "transition-transform duration-200"} />
                                     </Button>
                                 }
-                                <span className="text-3xl">{pinDetail?.likesCount}</span>
+                                <span className={`text-3xl transition-transform duration-200 ${likeAnimating ? "scale-110" : "scale-100"}`}>
+                                    {pinDetail?.likesCount}
+                                </span>
                             </div>
 
                             <Dropdown>
