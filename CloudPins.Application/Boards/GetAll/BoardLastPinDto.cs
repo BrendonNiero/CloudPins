@@ -1,3 +1,3 @@
 namespace CloudPins.Application.Boards.GetAll;
 
-public record BoardLastPinDto(string ThumbnailUrl);
+public record BoardLastPinDto(string ThumbnailUrl, string Title);

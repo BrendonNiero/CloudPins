@@ -2,5 +2,6 @@ namespace CloudPins.Application.Boards.GetById;
 
 public record BoardPinItemDto(
     Guid Id,
-    string ThumbnailUrl
+    string ThumbnailUrl,
+    string Title
 );

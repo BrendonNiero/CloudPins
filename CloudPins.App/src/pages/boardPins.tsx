@@ -22,6 +22,7 @@ export default function BoardPins()
     const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState(false);
     const [pins, setPins] = useState<Pin[]>([]);
+    const [pinSearch, setPinSearch] = useState("");
     const [tags, setTags] = useState<Tag[]>();
     const [error, setError] = useState("");
 
@@ -38,6 +39,10 @@ export default function BoardPins()
 
     // MODAL CRIAR PIN
     const { isOpen, onOpen, onClose, onOpenChange} = useDisclosure();
+
+    const filteredPins = pins.filter((pin) =>
+        pin.title.toLowerCase().includes(pinSearch.trim().toLowerCase())
+    );
 
     async function loadPins()
     {
@@ -176,6 +181,8 @@ export default function BoardPins()
                     <Input 
                             placeholder="Encontrar Pin" 
                             startContent={<IoSearch />} 
+                            value={pinSearch}
+                            onValueChange={setPinSearch}
                             className="w-full md:max-w-[200px] lg:max-w-[400px]" />
                     <Button onPress={onOpen}
                         startContent={<FaPlus />} variant="shadow" color="primary">Criar novo Pin</Button>
@@ -185,13 +192,23 @@ export default function BoardPins()
                     Array.from({ length: 20}).map((_, i) => (
                         <Skeleton key={i} className="h-80 w-full rounded-lg break-inside-avoid"/>
                     )) : 
-                    pins.map((pin) => (
-                        <Link key={pin.id} href={`/explorar/${pin.id}`}>
+                    filteredPins.map((pin) => (
+                        <Link key={pin.id} href={`/explorar/${pin.id}`} className="block w-full break-inside-avoid">
                             <img src={`http://localhost:5023${pin.thumbnailUrl}`}
+                                alt={pin.title}
+                                title={pin.title}
                                 className="w-full rounded-lg break-inside-avoid"/>
+                            <p className="mt-1 w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-foreground">
+                                {pin.title || "Sem título"}
+                            </p>
                         </Link>
                         ))
                     }
+                    {!loading && pinSearch.trim() && filteredPins.length === 0 && (
+                        <p className="col-span-full py-10 text-center text-default-500">
+                            Nenhum pin encontrado com esse título.
+                        </p>
+                    )}
                 </section>
                 <Modal backdrop="blur" isOpen={isOpen} placement="bottom-center" 
                     onClose={handleModalCreatePinClose} onOpenChange={onOpenChange}>

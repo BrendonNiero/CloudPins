@@ -28,7 +28,8 @@ public class BoardReadRepository : IBoardReadRepository
             .Select(p => new BoardPinItemDto
             (
                 p.Id,
-                p.ThumbnailUrl
+                p.ThumbnailUrl,
+                p.Title
             ))
             .ToList()
         ))
@@ -69,7 +70,7 @@ public class BoardReadRepository : IBoardReadRepository
                 b.Id,
                 b.Name,
                 b.IsPublic,
-                boardPins.Select(p => new BoardLastPinDto(p.ThumbnailUrl))
+                boardPins.Select(p => new BoardLastPinDto(p.ThumbnailUrl, p.Title))
                         .Take(3).ToList(),
                 boardPins.Count,
                 b.CreatedAt

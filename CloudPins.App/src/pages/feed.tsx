@@ -89,9 +89,14 @@ export default function Feed()
                     <Skeleton key={i} className="h-80 w-full rounded-lg break-inside-avoid" />
                 ))
             : feed.map((pin) => (
-                <Link key={pin.id} href={`/explorar/${pin.id}`}>
+                <Link key={pin.id} href={`/explorar/${pin.id}`} className="block w-full break-inside-avoid">
                 <img src={`http://localhost:5023${pin.thumbnailUrl}`} 
+                alt={pin.title}
+                title={pin.title}
                 className="w-full rounded-lg break-inside-avoid" />
+                <p className="mt-1 w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-foreground">
+                    {pin.title || "Sem título"}
+                </p>
                 </Link>
             ))}
             </section>

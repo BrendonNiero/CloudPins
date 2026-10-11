@@ -1,6 +1,7 @@
 type thumbnailUrl = 
 { 
     thumbnailUrl: string;
+    title: string;
 }
 
 export type Board = 

@@ -265,11 +265,15 @@ export default function Profile()
                                                 if(i === 0){
                                                     return(
                                                         <img key={i} src={`http://localhost:5023${lastPin.thumbnailUrl}`}
+                                                        alt={lastPin.title}
+                                                        title={lastPin.title}
                                                         className="col-span-2 row-span-2 w-full h-full object-cover rounded-xl"/>
                                                     );
                                                 }
                                                 return (
                                                     <img key={i} src={`http://localhost:5023${lastPin.thumbnailUrl}`}
+                                                    alt={lastPin.title}
+                                                    title={lastPin.title}
                                                     className="w-full h-full object-cover rounded-xl" />
                                                 );
                                             })}

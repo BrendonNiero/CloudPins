@@ -87,7 +87,8 @@ public class PinReadRepository : IPinReadRepository
             .Select(x => new PinFeedItemDto
             {
                 Id = x.Pin.Id,
-                ThumbnailUrl = x.Pin.ThumbnailUrl
+                ThumbnailUrl = x.Pin.ThumbnailUrl,
+                Title = x.Pin.Title
             })
             .ToListAsync(ct);
     }
@@ -113,7 +114,8 @@ public class PinReadRepository : IPinReadRepository
             .Select(p => new PinFeedItemDto
             {
                 Id = p.Id,
-                ThumbnailUrl = p.ThumbnailUrl
+                ThumbnailUrl = p.ThumbnailUrl,
+                Title = p.Title
             })
             .ToListAsync(ct)
             .ContinueWith(t =>
@@ -165,7 +167,8 @@ public class PinReadRepository : IPinReadRepository
                 .Select(x => new PinFeedItemDto
                 {
                     Id = x.Pin.Id,
-                    ThumbnailUrl = x.Pin.ThumbnailUrl
+                    ThumbnailUrl = x.Pin.ThumbnailUrl,
+                    Title = x.Pin.Title
                 })
                 .ToListAsync(ct)
                 .ContinueWith(t =>
@@ -191,7 +194,8 @@ public class PinReadRepository : IPinReadRepository
         .Select(p => new PinBoardItemDto
         {
             Id = p.Id,
-            ThumbnailUrl = p.ThumbnailUrl
+            ThumbnailUrl = p.ThumbnailUrl,
+            Title = p.Title
         })
         .ToListAsync(ct);
     }
