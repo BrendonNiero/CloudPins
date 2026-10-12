@@ -194,9 +194,9 @@ export default function Explorer()
                  error || feedError ? (
                     <ErrorMensage error={error || feedError}/>
                 ) :
-            <section className="columns-2 sm:col-end-3 md:columns-4 gap-3 space-y-3">
+            <section className="md:columns-4 gap-3 space-y-3">
                 {!loadingDetail ?
-                    <div className="p-3 sm:p-4 lg:p-6  border border-default-500 w-full rounded-xl break-inside-avoid">
+                    <div className="w-full p-3 sm:p-4 lg:p-6 border border-default-500 rounded-xl break-inside-avoid">
                         <img src={`http://localhost:5023${pinDetail?.imageUrl}`} className="rounded-lg" />
                         <h1 className="text-xl sm:text-4xl font-bold">{pinDetail?.title}</h1>
                         <p>{pinDetail?.description}</p>
@@ -238,12 +238,13 @@ export default function Explorer()
                         </div>
                     </div>
                  : 
-                    <div className="p-8 border border-default-500 w-full rounded-xl flex flex-col gap-3">
+                    <div className="p-8 border border-default-500 w-full rounded-xl flex flex-col gap-3 break-inside-avoid">
                         <Skeleton className="h-[400px] w-full rounded-md"/>
                         <Skeleton className="p-6 rounded-md w-full" />
                         <Skeleton className="p-3 rounded-md w-full" />
                     </div>
-                }   
+                }
+                <div className="columns-2 md:contents gap-3 space-y-3">
                     { loadingFeed ? Array.from({ length: 20}).map((_, i) => (
                         <Skeleton key={i} className="h-80 w-full rounded-lg break-inside-avoid"/>
                     )) :
@@ -258,7 +259,8 @@ export default function Explorer()
                             </p>
                         </Link>
                     ))}
-                </section>
+                </div>
+            </section>
             }      
             { hasMore && !error && (
                 <div ref={lastElementRef} className="flex justify-center my-10">
