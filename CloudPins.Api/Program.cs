@@ -1,5 +1,6 @@
 using System.Text;
 using CloudPins.Api.Common;
+using CloudPins.Api.Observability;
 using CloudPins.Api.Seed;
 using CloudPins.Application;
 using CloudPins.Infrastructure;
@@ -48,6 +49,15 @@ builder.Services.AddSwaggerWithJwt();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddCloudPinsTelemetry(builder.Configuration);
+
+builder.Logging.ClearProviders();
+
+builder.Logging.AddJsonConsole(options => {
+    options.IncludeScopes = true;
+    options.TimestampFormat = "yyyy-MM-ddTHH:mm:ss.fffzzz";
+    options.UseUtcTimestamp = true;
+});
 
 var app = builder.Build();
 

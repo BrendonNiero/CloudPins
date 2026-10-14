@@ -159,4 +159,38 @@ else
     }'
 fi
 
+create_otel_data_stream() {
+  stream_name="$1"
+
+  echo "Creating Elasticsearch template for $stream_name..."
+
+  curl -sf -X PUT "$ELASTICSEARCH_URL/_index_template/${stream_name}-template" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"index_patterns\": [\"${stream_name}\"],
+      \"priority\": 500,
+      \"data_stream\": {},
+      \"template\": {
+        \"settings\": {
+          \"index.number_of_shards\": 1,
+          \"index.number_of_replicas\": 0
+        }
+      }
+    }"
+
+  STREAM_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" \
+    "$ELASTICSEARCH_URL/_data_stream/$stream_name")
+
+  if [ "$STREAM_EXISTS" = "200" ]; then
+    echo "Data stream $stream_name already exists."
+  else
+    echo "Creating data stream $stream_name..."
+    curl -sf -X PUT "$ELASTICSEARCH_URL/_data_stream/$stream_name"
+  fi
+}
+
+create_otel_data_stream "cloudpins-otel-traces"
+create_otel_data_stream "cloudpins-otel-metrics"
+create_otel_data_stream "cloudpins-otel-logs"
+
 echo "Elasticsearch initialization completed."

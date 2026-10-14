@@ -1,5 +1,6 @@
 using CloudPins.Application.Common.Exceptions;
 using CloudPins.Application.Common.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace CloudPins.Application.Pins.Delete;
 
@@ -8,16 +9,19 @@ public sealed class DeletePinCommandHandler
     private readonly IPinRepository _pinRepository;
     private readonly IPinSearchService _pinSearchService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<DeletePinCommandHandler> _logger;
 
     public DeletePinCommandHandler(
         IPinRepository pinRepository,
         IPinSearchService pinSearchService,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        ILogger<DeletePinCommandHandler> logger
     )
     {
         _pinRepository = pinRepository;
         _pinSearchService = pinSearchService;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task Handle(
@@ -39,5 +43,10 @@ public sealed class DeletePinCommandHandler
         await _unitOfWork.SaveChangesAsync(ct);
 
         await _pinSearchService.DeleteAsync(pin.Id, ct);
+
+        _logger.LogInformation(
+            "Pin deleted and removed from search index. PinId {PinId}, OwnerId {OwnerId}",
+            pin.Id,
+            currentUserId);
     }
 }

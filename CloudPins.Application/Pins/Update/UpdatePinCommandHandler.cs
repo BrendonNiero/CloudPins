@@ -1,5 +1,6 @@
 using CloudPins.Application.Common.Exceptions;
 using CloudPins.Application.Common.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace CloudPins.Application.Pins.Update;
 
@@ -10,13 +11,15 @@ public sealed class UpdatePinCommandHandler
     private readonly IPinSearchService _pinSearchService;
     private readonly ISuggestionReindexQueue _suggestionReindexQueue;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<UpdatePinCommandHandler> _logger;
 
     public UpdatePinCommandHandler(
         IPinRepository pinRepository,
         ITagRepository tagRepository,
         IPinSearchService pinSearchService,
         ISuggestionReindexQueue suggestionReindexQueue,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        ILogger<UpdatePinCommandHandler> logger
     )
     {
         _pinRepository = pinRepository;
@@ -24,6 +27,7 @@ public sealed class UpdatePinCommandHandler
         _pinSearchService = pinSearchService;
         _suggestionReindexQueue = suggestionReindexQueue;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task Handle(
@@ -54,5 +58,11 @@ public sealed class UpdatePinCommandHandler
 
         await _pinSearchService.UpdateAsync(pin, tagNames, ct);
         _suggestionReindexQueue.Enqueue();
+
+        _logger.LogInformation(
+            "Pin updated and reindexed. PinId {PinId}, OwnerId {OwnerId}, TagsCount {TagsCount}",
+            pin.Id,
+            currentUserId,
+            tagIds.Count);
     }
 }

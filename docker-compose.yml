@@ -47,6 +47,37 @@ services:
       - ./docker/elasticsearch/init.sh:/init.sh:ro
     entrypoint: ["/bin/sh", "/init.sh"]
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.0
+    container_name: cloudpins_kibana
+    restart: always
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      XPACK_SECURITY_ENABLED: "false"
+    ports:
+      - "5601:5601"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.123.0
+    container_name: cloudpins_otel_collector
+    restart: always
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      elasticsearch-init:
+        condition: service_completed_successfully
+    command:
+      - "--config=/etc/otelcol-contrib/otel-collector-config.yml"
+    volumes:
+      - ./docker/otel/otel-collector-config.yml:/etc/otelcol-contrib/otel-collector-config.yml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8888:8888"    
+
   api:
     build:
       context: .
@@ -59,9 +90,12 @@ services:
         condition: service_healthy
       elasticsearch-init:
         condition: service_completed_successfully
+      otel-collector:
+        condition: service_started
     environment:
       ASPNETCORE_URLS: http://+:8080
       ASPNETCORE_ENVIRONMENT: Development
+      OpenTelemetry__OtlpEndpoint: http://otel-collector:4317
     ports:
       - "5023:8080"
     volumes:

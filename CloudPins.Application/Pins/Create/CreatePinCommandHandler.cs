@@ -1,6 +1,7 @@
 using CloudPins.Application.Common.Exceptions;
 using CloudPins.Application.Common.Interfaces;
 using CloudPins.Domain.Pins;
+using Microsoft.Extensions.Logging;
 
 namespace CloudPins.Application.Pins.Create;
 
@@ -13,6 +14,7 @@ public class CreatePinCommandHandler
     private readonly IPinSearchService _pinSearchService;
     private readonly ISuggestionReindexQueue _suggestionReindexQueue;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<CreatePinCommandHandler> _logger;
 
     public CreatePinCommandHandler(
         IPinRepository pinRepository,
@@ -21,7 +23,8 @@ public class CreatePinCommandHandler
         ITagRepository tagRepository,
         IPinSearchService pinSearchService,
         ISuggestionReindexQueue suggestionReindexQueue,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        ILogger<CreatePinCommandHandler> logger
     )
     {
         _pinRepository = pinRepository;
@@ -31,6 +34,7 @@ public class CreatePinCommandHandler
         _pinSearchService = pinSearchService;
         _suggestionReindexQueue = suggestionReindexQueue;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<CreatePinResult> Handle(
@@ -70,6 +74,12 @@ public class CreatePinCommandHandler
 
         await _pinSearchService.IndexAsync(pin, tagNames, ct);
         _suggestionReindexQueue.Enqueue();
+
+        _logger.LogInformation(
+            "Pin created and indexed. PinId {PinId}, BoardId {BoardId}, OwnerId {OwnerId}",
+            pin.Id,
+            pin.BoardId,
+            currentUserId);
 
 
         return new CreatePinResult
