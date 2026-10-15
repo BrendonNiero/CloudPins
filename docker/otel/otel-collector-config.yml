@@ -6,6 +6,15 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
+  prometheus/cadvisor:
+    config:
+      scrape_configs:
+        - job_name: cadvisor
+          scrape_interval: 15s
+          static_configs:
+            - targets:
+                - cadvisor:8080
+
 processors:
   batch:
     timeout: 5s
@@ -43,6 +52,7 @@ service:
     metrics:
       receivers:
         - otlp
+        - prometheus/cadvisor
       processors:
         - resource
         - batch

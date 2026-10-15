@@ -9,9 +9,11 @@ using CloudPins.Application.Pins.LikePin;
 using CloudPins.Application.Pins.UnlikePin;
 using CloudPins.Application.Pins.Update;
 using CloudPins.Infrastructure.Search;
+using CloudPins.Infrastructure.Observability;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
+using System.Diagnostics;
 
 namespace CloudPins.Api.Controllers;
 
@@ -147,6 +149,16 @@ public class PinsController : ControllerBase
         }
         catch (Exception exception)
         {
+            using var activity = CloudPinsTelemetry.ActivitySource.StartActivity(
+                "PostgreSQL.SearchFallback",
+                ActivityKind.Client);
+
+            activity?.SetTag("search.term", search);
+            activity?.SetTag("search.page", page);
+            activity?.SetTag("search.page_size", pageSize);
+
+            CloudPinsTelemetry.SearchFallbacks.Add(1);
+
             _logger.LogWarning(
                 exception,
                 "Elasticsearch unavailable. Using PostgreSQL fallback. SearchTerm {SearchTerm}",

@@ -24,6 +24,9 @@ public static class CloudPinsTelemetry
     public static readonly Counter<long> SearchFailures =
         Meter.CreateCounter<long>("cloudpins.search.failures");
 
+    public static readonly Counter<long> SearchFallbacks =
+        Meter.CreateCounter<long>("cloudpins.search.fallbacks");
+
     public static readonly Counter<long> SuggestionFailures =
         Meter.CreateCounter<long>("cloudpins.suggestions.failures");
 }
