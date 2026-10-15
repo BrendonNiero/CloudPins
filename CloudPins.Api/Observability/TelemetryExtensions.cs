@@ -2,6 +2,7 @@ using System.Diagnostics;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using CloudPins.Infrastructure.Observability;
 
 namespace CloudPins.Api.Observability;
 
@@ -52,7 +53,7 @@ public static class TelemetryExtensions
                     })
                     .AddEntityFrameworkCoreInstrumentation()
                     .AddSource("CloudPins.Api")
-                    .AddSource("CloudPins.Infrastructure");
+                    .AddSource(CloudPinsTelemetry.ActivitySourceName);
 
                 if (Uri.TryCreate(
                     otlpEndpoint,
@@ -70,7 +71,8 @@ public static class TelemetryExtensions
                 metrics
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
+                    .AddRuntimeInstrumentation()
+                    .AddMeter(CloudPinsTelemetry.MeterName);
 
                 if (Uri.TryCreate(
                     otlpEndpoint,

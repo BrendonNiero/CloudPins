@@ -1,8 +1,10 @@
 using CloudPins.Application.Common.Interfaces;
 using CloudPins.Application.Pins.Search;
 using CloudPins.Domain.Pins;
+using CloudPins.Infrastructure.Observability;
 using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace CloudPins.Infrastructure.Search;
 
@@ -33,18 +35,28 @@ public sealed class ElasticsearchService : IPinSearchService
             .Trim()
             .ToLowerInvariant();
     
+        using var activity = CloudPinsTelemetry.ActivitySource.StartActivity(
+            "Elasticsearch.Autocomplete",
+            ActivityKind.Client);
+
+        activity?.SetTag("search.term", normalizedSearchTerm);
+
         var response = await _client.SearchAsync<SuggestionDocument>(
-            request => request
-                .Index("cloudpins_suggestions")
-                .Size(size * 3)
-                .Query(query => query
-                    .Prefix(prefix => prefix
-                        .Field(new Field("normalizedText"))
-                        .Value(normalizedSearchTerm))),
-            cancellationToken);
+                request => request
+                    .Index("cloudpins_suggestions")
+                    .Size(size * 3)
+                    .Query(query => query
+                        .Prefix(prefix => prefix
+                            .Field(new Field("normalizedText"))
+                            .Value(normalizedSearchTerm))),
+                cancellationToken);
     
         if (!response.IsValidResponse)
         {
+            CloudPinsTelemetry.SearchFailures.Add(
+                1,
+                new KeyValuePair<string, object?>("operation", "autocomplete"));
+
             throw new InvalidOperationException(
                 "Could not retrieve autocomplete suggestions.");
         }
@@ -81,6 +93,16 @@ public sealed class ElasticsearchService : IPinSearchService
 
         var from = (page - 1) * pageSize;
 
+        using var activity = CloudPinsTelemetry.ActivitySource.StartActivity(
+            "Elasticsearch.Search",
+            ActivityKind.Client);
+
+        activity?.SetTag("search.term", searchTerm);
+        activity?.SetTag("search.page", page);
+        activity?.SetTag("search.page_size", pageSize);
+
+        var stopwatch = Stopwatch.StartNew();
+
         var response = await _client.SearchAsync<PinDocument>(
             request => request
                 .Index(_options.IndexName)
@@ -99,6 +121,10 @@ public sealed class ElasticsearchService : IPinSearchService
 
         if (!response.IsValidResponse)
         {
+            CloudPinsTelemetry.SearchFailures.Add(
+                1,
+                new KeyValuePair<string, object?>("operation", "search"));
+
             throw new InvalidOperationException(
                 "Could not search pins in Elasticsearch.");
         }
@@ -114,6 +140,12 @@ public sealed class ElasticsearchService : IPinSearchService
                 Tags = document.Tags
             })
             .ToArray();
+
+        stopwatch.Stop();
+        CloudPinsTelemetry.SearchDuration.Record(
+            stopwatch.Elapsed.TotalMilliseconds,
+            new KeyValuePair<string, object?>("source", "elasticsearch"));
+        activity?.SetTag("search.result_count", items.Length);
 
         return new PinSearchResult
         {
@@ -143,6 +175,10 @@ public sealed class ElasticsearchService : IPinSearchService
             throw new InvalidOperationException(
                 $"Could not index pin '{pin.Id}' in Elasticsearch.");
         }
+
+        CloudPinsTelemetry.PinsIndexed.Add(
+            1,
+            new KeyValuePair<string, object?>("operation", "index"));
     }
 
     public async Task UpdateAsync(

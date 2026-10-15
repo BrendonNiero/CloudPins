@@ -19,6 +19,7 @@ namespace CloudPins.Api.Controllers;
 [Route("/pins")]
 public class PinsController : ControllerBase
 {
+    private readonly ILogger<PinsController> _logger;
     private readonly CreatePinCommandHandler _createHandler;
     private readonly GetPinByIdQueryHandler _getByIdHandler;
     private readonly GetPinsFeedQueryHandler _feedHandler;
@@ -40,7 +41,8 @@ public class PinsController : ControllerBase
         UpdatePinCommandHandler updatePinHandler,
         DeletePinCommandHandler deletePinCommand,
         UnlikePinCommandHandler unlikePinHandler,
-        ElasticsearchService elasticsearchService
+        ElasticsearchService elasticsearchService,
+        ILogger<PinsController> logger
     )
     {
         _createHandler = createHandler;
@@ -53,6 +55,7 @@ public class PinsController : ControllerBase
         _deletePinHandler = deletePinCommand;
         _unlikePinHandler = unlikePinHandler;
         _elasticsearchService = elasticsearchService;
+        _logger = logger;
     }
 
     [Authorize]
@@ -144,8 +147,10 @@ public class PinsController : ControllerBase
         }
         catch (Exception exception)
         {
-            Console.WriteLine(
-                $"Elasticsearch unavailable. Using PostgreSQL fallback. {exception.Message}");
+            _logger.LogWarning(
+                exception,
+                "Elasticsearch unavailable. Using PostgreSQL fallback. SearchTerm {SearchTerm}",
+                search);
 
             var postgresResult = await _getSearchHandler.Handle(
                 new SearchFeedQuery(search, page, pageSize),

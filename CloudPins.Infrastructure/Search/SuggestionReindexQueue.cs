@@ -1,5 +1,6 @@
 using System.Threading.Channels;
 using CloudPins.Application.Common.Interfaces;
+using CloudPins.Infrastructure.Observability;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -38,6 +39,10 @@ public sealed class SuggestionReindexQueue : BackgroundService, ISuggestionReind
         {
             try
             {
+                using var activity = CloudPinsTelemetry.ActivitySource.StartActivity(
+                    "Suggestions.Reindex",
+                    System.Diagnostics.ActivityKind.Internal);
+
                 using var scope = _scopeFactory.CreateScope();
                 var service = scope.ServiceProvider
                     .GetRequiredService<ISuggestionService>();
@@ -50,6 +55,8 @@ public sealed class SuggestionReindexQueue : BackgroundService, ISuggestionReind
             }
             catch (Exception exception)
             {
+                CloudPinsTelemetry.SuggestionFailures.Add(1);
+
                 _logger.LogError(
                     exception,
                     "Could not reindex autocomplete suggestions in background.");

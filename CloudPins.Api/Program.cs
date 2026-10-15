@@ -6,6 +6,7 @@ using CloudPins.Application;
 using CloudPins.Infrastructure;
 using CloudPins.Infrastructure.Extensions;
 using CloudPins.Infrastructure.Search;
+using CloudPins.Infrastructure.Health;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -50,6 +51,10 @@ builder.Services.AddSwaggerWithJwt();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddCloudPinsTelemetry(builder.Configuration);
+builder.Services
+    .AddHealthChecks()
+    .AddCheck<ElasticsearchHealthCheck>("elasticsearch")
+    .AddCheck<PostgresHealthCheck>("postgresql");
 
 builder.Logging.ClearProviders();
 
@@ -121,6 +126,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 app.Run();
